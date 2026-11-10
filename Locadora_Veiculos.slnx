@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Locadora_Veiculos.csproj" />
+  <Project Path="Locadora_Veiculos.Tests/Locadora_Veiculos.Tests.csproj" />
+</Solution>
