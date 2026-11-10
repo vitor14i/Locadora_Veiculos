@@ -36,4 +36,20 @@ public abstract class Veiculo
 
     /// <summary>Token de concorrência otimista gerado pelo SQL Server.</summary>
     public byte[] RowVersion { get; set; } = [];
+
+    /// <summary>Contratos que incluem este veículo ao longo do tempo.</summary>
+    public ICollection<Contrato> Contratos { get; } = new List<Contrato>();
+
+    /// <summary>Associações com contratos e os valores individuais de locação.</summary>
+    public ICollection<ContratoVeiculo> ContratoVeiculos { get; } = new List<ContratoVeiculo>();
+
+    internal void AdicionarContrato(Contrato contrato)
+    {
+        ArgumentNullException.ThrowIfNull(contrato);
+
+        if (!Contratos.Contains(contrato))
+        {
+            Contratos.Add(contrato);
+        }
+    }
 }

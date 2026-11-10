@@ -30,9 +30,10 @@ public class RelatorioController
 
         const string sql = """
             SELECT v.Categoria AS Categoria,
-                   SUM(c.ValorTotal) AS ValorTotal
-            FROM [Contratos] AS c
-            INNER JOIN [Veiculos] AS v ON v.Id = c.VeiculoId
+                   SUM(cv.ValorLocacao) AS ValorTotal
+            FROM [ContratoVeiculos] AS cv
+            INNER JOIN [Contratos] AS c ON c.Id = cv.ContratoId
+            INNER JOIN [Veiculos] AS v ON v.Id = cv.VeiculoId
             WHERE c.Ativo = 1
             GROUP BY v.Categoria
             ORDER BY v.Categoria

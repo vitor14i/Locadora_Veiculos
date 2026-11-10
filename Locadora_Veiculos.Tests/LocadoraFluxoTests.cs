@@ -17,7 +17,7 @@ public class LocadoraFluxoTests
     [Theory]
     [InlineData(7, 840)]
     [InlineData(8, 864)]
-    public void CalculadoraCarro_UsaDiariaDoVeiculoEAplicaDesconto(int dias, decimal esperado)
+    public void Carro_UsaDiariaEAplicaDesconto(int dias, decimal esperado)
     {
         var calculadora = CriarCalculadoraCarro();
 
@@ -37,7 +37,7 @@ public class LocadoraFluxoTests
     }
 
     [Fact]
-    public void Calculadora_RejeitaDiariaOuDuracaoInvalidas()
+    public void Carro_RejeitaDiariaOuDuracaoInvalidas()
     {
         var calculadora = CriarCalculadoraCarro();
 
@@ -87,7 +87,8 @@ public class LocadoraFluxoTests
 
         Assert.Equal(840m, contrato.ValorTotal);
         Assert.Equal(StatusVeiculo.Locado, carroSalvo.Status);
-        Assert.Equal(carro.Id, contrato.VeiculoId);
+        Assert.Contains(carro.Id, contrato.Veiculos.Select(item => item.Id));
+        Assert.Equal(840m, contrato.ContratoVeiculos.Single().ValorLocacao);
         Assert.Equal(cliente.Id, contrato.ClienteId);
     }
 
@@ -133,12 +134,12 @@ public class LocadoraFluxoTests
         var contrato = new Contrato
         {
             Id = 10,
-            Cliente = cliente,
-            Veiculo = carro,
             DataInicio = dataInicio,
             DiasLocacao = 1,
             ValorTotal = 100m
         };
+        contrato.AssociarCliente(cliente);
+        contrato.AdicionarVeiculo(carro, 100m);
 
         await using (var contexto = await factory.CreateDbContextAsync())
         {
@@ -158,16 +159,22 @@ public class LocadoraFluxoTests
         Assert.Equal(StatusVeiculo.Disponivel, carroSalvo.Status);
     }
 
-    private static CalculadoraTarifaCarro CriarCalculadoraCarro()
+    private static Carro CriarCalculadoraCarro()
     {
-        return new CalculadoraTarifaCarro(Options.Create(new TarifasConfig()));
+        return new Carro(Options.Create(new TarifasConfig()))
+        {
+            Placa = "ABC1D23",
+            Marca = "Marca",
+            Modelo = "Modelo",
+            Categoria = "Carro"
+        };
     }
 
     private static ServiceProvider CriarTarifaProvider()
     {
         var services = new ServiceCollection();
         services.AddOptions<TarifasConfig>();
-        services.AddKeyedTransient<ITarifa, CalculadoraTarifaCarro>(typeof(Carro));
+        services.AddKeyedTransient<ITarifa, Carro>(typeof(Carro));
         services.AddKeyedTransient<ITarifa, CalculadoraTarifaMoto>(typeof(Moto));
         services.AddTransient<ITarifaResolver, TarifaResolver>();
         return services.BuildServiceProvider();

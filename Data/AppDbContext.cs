@@ -50,6 +50,12 @@ public class AppDbContext : DbContext
     /// <summary>Contratos de locação cadastrados no sistema.</summary>
     public DbSet<Contrato> Contratos => Set<Contrato>();
 
+    /// <summary>Pagamentos cadastrados.</summary>
+    public DbSet<Pagamento> Pagamentos => Set<Pagamento>();
+
+    /// <summary>Associações entre contratos e veículos com seus valores individuais.</summary>
+    public DbSet<ContratoVeiculo> ContratoVeiculos => Set<ContratoVeiculo>();
+
     /// <summary>
     /// Configura a conexão padrão com o banco de dados LocalDB.
     /// </summary>
@@ -85,11 +91,40 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Veiculo>().ToTable("Veiculos");
         modelBuilder.Entity<Contrato>().ToTable("Contratos");
+        modelBuilder.Entity<Pagamento>()
+            .HasDiscriminator<string>("TipoPagamento")
+            .HasValue<Cartao>("Cartao")
+            .HasValue<Pix>("Pix");
+        modelBuilder.Entity<Pagamento>().ToTable("Pagamentos");
+        modelBuilder.Entity<Pagamento>()
+            .HasOne(pagamento => pagamento.Contrato)
+            .WithMany(contrato => contrato.Pagamentos)
+            .HasForeignKey(pagamento => pagamento.ContratoId);
+        modelBuilder.Entity<Contrato>()
+            .HasMany(contrato => contrato.Veiculos)
+            .WithMany(veiculo => veiculo.Contratos)
+            .UsingEntity<ContratoVeiculo>(
+                veiculo => veiculo
+                    .HasOne(associacao => associacao.Veiculo)
+                    .WithMany(item => item.ContratoVeiculos)
+                    .HasForeignKey(associacao => associacao.VeiculoId),
+                contrato => contrato
+                    .HasOne(associacao => associacao.Contrato)
+                    .WithMany(item => item.ContratoVeiculos)
+                    .HasForeignKey(associacao => associacao.ContratoId),
+                associacao =>
+                {
+                    associacao.HasKey(item => new { item.ContratoId, item.VeiculoId });
+                    associacao.Property(item => item.ValorLocacao).HasPrecision(18, 2);
+                });
         modelBuilder.Entity<Contrato>()
             .Property(contrato => contrato.ValorTotal)
             .HasPrecision(18, 2);
         modelBuilder.Entity<Contrato>()
             .Property(contrato => contrato.ValorMulta)
+            .HasPrecision(18, 2);
+        modelBuilder.Entity<Pagamento>()
+            .Property(pagamento => pagamento.Valor)
             .HasPrecision(18, 2);
         modelBuilder.Entity<Veiculo>()
             .Property(veiculo => veiculo.RowVersion)
@@ -99,6 +134,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Usuario>().HasQueryFilter(usuario => usuario.Ativo);
         modelBuilder.Entity<Veiculo>().HasQueryFilter(veiculo => veiculo.Ativo);
         modelBuilder.Entity<Contrato>().HasQueryFilter(contrato => contrato.Ativo);
+        modelBuilder.Entity<Pagamento>().HasQueryFilter(pagamento => pagamento.Ativo);
 
         modelBuilder.Entity<Usuario>()
             .HasIndex(usuario => usuario.Email)

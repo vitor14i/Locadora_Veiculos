@@ -48,7 +48,7 @@ public sealed class DevolucaoController
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         var contrato = await context.Contratos
             .IgnoreQueryFilters()
-            .Include(item => item.Veiculo)
+            .Include(item => item.Veiculos)
             .SingleOrDefaultAsync(item => item.Id == contratoId)
             ?? throw new InvalidOperationException("Contrato não encontrado.");
 
@@ -74,11 +74,20 @@ public sealed class DevolucaoController
             ? 0
             : (int)Math.Ceiling((dataDevolucaoUtc - dataPrevista).TotalDays);
 
+        if (contrato.Veiculos.Count == 0)
+        {
+            throw new InvalidOperationException("O contrato não possui veículos associados.");
+        }
+
         contrato.DataDevolucao = dataDevolucaoUtc;
         contrato.DiasAtraso = diasAtraso;
-        contrato.ValorMulta = _calculadoraMulta.Calcular(
-            contrato.Veiculo.ValorDiaria, diasAtraso);
-        contrato.Veiculo.Status = StatusVeiculo.Disponivel;
+        contrato.ValorMulta = contrato.Veiculos.Sum(veiculo =>
+            diasAtraso == 0 ? 0 : _calculadoraMulta.Calcular(veiculo.ValorDiaria, diasAtraso));
+
+        foreach (var veiculo in contrato.Veiculos)
+        {
+            veiculo.Status = StatusVeiculo.Disponivel;
+        }
 
         try
         {

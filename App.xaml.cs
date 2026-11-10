@@ -24,7 +24,7 @@ namespace Locadora_Veiculos
             services.AddSingleton<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
             services.AddOptions<TarifasConfig>();
 
-            services.AddKeyedTransient<ITarifa, CalculadoraTarifaCarro>(typeof(Carro));
+            services.AddKeyedTransient<ITarifa, Carro>(typeof(Carro));
             services.AddKeyedTransient<ITarifa, CalculadoraTarifaMoto>(typeof(Moto));
             services.AddTransient<ITarifaResolver, TarifaResolver>();
             services.AddTransient<IMultaAtraso, CalculadoraMultaAtraso>();

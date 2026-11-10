@@ -39,16 +39,44 @@ public class LocacaoController
         int clienteId,
         int dias)
     {
+        return await RegistrarContratoAsync([veiculoId], clienteId, dias);
+    }
+
+    /// <summary>
+    /// Registra um contrato para vários veículos disponíveis e um cliente existente.
+    /// </summary>
+    public async Task<Contrato> RegistrarContratoAsync(
+        IReadOnlyCollection<int> veiculoIds,
+        int clienteId,
+        int dias)
+    {
+        ArgumentNullException.ThrowIfNull(veiculoIds);
+        if (veiculoIds.Count == 0)
+        {
+            throw new ArgumentException("Informe ao menos um veículo.", nameof(veiculoIds));
+        }
+
+        if (veiculoIds.Distinct().Count() != veiculoIds.Count)
+        {
+            throw new ArgumentException("A lista contém veículos duplicados.", nameof(veiculoIds));
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(dias);
+
         await using var context = await _dbContextFactory.CreateDbContextAsync();
 
-        var veiculo = await context.Veiculos
-            .SingleOrDefaultAsync(item => item.Id == veiculoId)
-            ?? throw new InvalidOperationException("Veículo não encontrado.");
+        var veiculos = await context.Veiculos
+            .Where(item => veiculoIds.Contains(item.Id))
+            .ToListAsync();
 
-        if (veiculo.Status != StatusVeiculo.Disponivel)
+        if (veiculos.Count != veiculoIds.Count)
         {
-            throw new InvalidOperationException(
-                "O veículo não está disponível para locação.");
+            throw new InvalidOperationException("Um ou mais veículos não foram encontrados.");
+        }
+
+        if (veiculos.Any(veiculo => veiculo.Status != StatusVeiculo.Disponivel))
+        {
+            throw new InvalidOperationException("Um ou mais veículos não estão disponíveis para locação.");
         }
 
         var cliente = await context.Clientes
@@ -61,19 +89,27 @@ public class LocacaoController
             throw new InvalidOperationException("O cliente está inativo e não pode realizar uma locação.");
         }
 
-        // OCP/Strategy: o controller usa o contrato ITarifa sem conhecer a regra concreta de preço.
-        var calculadoraTarifa = _tarifaResolver.ResolverPara(veiculo);
-        var valorTotal = calculadoraTarifa.Calcular(veiculo.ValorDiaria, dias);
+        var valoresPorVeiculo = veiculos.Select(veiculo =>
+        {
+            // OCP/Strategy: o controller usa ITarifa sem conhecer a regra concreta de preço.
+            var tarifa = _tarifaResolver.ResolverPara(veiculo);
+            return (Veiculo: veiculo, Valor: tarifa.Calcular(veiculo.ValorDiaria, dias));
+        }).ToList();
+
         var contrato = new Contrato
         {
-            Veiculo = veiculo,
-            Cliente = cliente,
             DataInicio = DateTime.UtcNow,
             DiasLocacao = dias,
-            ValorTotal = valorTotal
+            ValorTotal = valoresPorVeiculo.Sum(item => item.Valor)
         };
+        contrato.AssociarCliente(cliente);
 
-        veiculo.Status = StatusVeiculo.Locado;
+        foreach (var (veiculo, valor) in valoresPorVeiculo)
+        {
+            contrato.AdicionarVeiculo(veiculo, valor);
+            veiculo.Status = StatusVeiculo.Locado;
+        }
+
         context.Contratos.Add(contrato);
 
         try
