@@ -65,7 +65,7 @@ public class AppDbContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseSqlServer(
-                "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=LocadoraDB;Integrated Security=True");
+                "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=LocadoraDB;Integrated Security=True;TrustServerCertificate=True");
         }
     }
 
@@ -77,6 +77,12 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // TPH mantém cada hierarquia em uma tabela com discriminador, reduzindo JOINs
+        // e mantendo simples a persistência de tipos que compartilham os mesmos dados-base.
+        modelBuilder.Entity<Usuario>().ToTable("Usuarios");
+        modelBuilder.Entity<Cliente>().HasBaseType<Usuario>();
+        modelBuilder.Entity<PessoaFisica>().HasBaseType<Cliente>();
+        modelBuilder.Entity<PessoaJuridica>().HasBaseType<Cliente>();
         modelBuilder.Entity<Usuario>()
             .HasDiscriminator<string>("TipoUsuario")
             .HasValue<PessoaFisica>("PessoaFisica")
@@ -84,22 +90,35 @@ public class AppDbContext : DbContext
             .HasValue<Gerente>("Gerente")
             .HasValue<Atendente>("Atendente");
 
+        modelBuilder.Entity<Veiculo>().ToTable("Veiculos");
+        modelBuilder.Entity<Carro>().HasBaseType<Veiculo>();
+        modelBuilder.Entity<Moto>().HasBaseType<Veiculo>();
         modelBuilder.Entity<Veiculo>()
             .HasDiscriminator<string>("TipoVeiculo")
             .HasValue<Carro>("Carro")
             .HasValue<Moto>("Moto");
 
-        modelBuilder.Entity<Veiculo>().ToTable("Veiculos");
         modelBuilder.Entity<Contrato>().ToTable("Contratos");
+        modelBuilder.Entity<Pagamento>().ToTable("Pagamentos");
         modelBuilder.Entity<Pagamento>()
             .HasDiscriminator<string>("TipoPagamento")
             .HasValue<Cartao>("Cartao")
             .HasValue<Pix>("Pix");
-        modelBuilder.Entity<Pagamento>().ToTable("Pagamentos");
+        modelBuilder.Entity<Cartao>().HasBaseType<Pagamento>();
+        modelBuilder.Entity<Pix>().HasBaseType<Pagamento>();
+        // 1:N: um Cliente pode ter vários Contratos; cada Contrato pertence a um Cliente.
+        modelBuilder.Entity<Contrato>()
+            .HasOne(contrato => contrato.Cliente)
+            .WithMany(cliente => cliente.Contratos)
+            .HasForeignKey(contrato => contrato.ClienteId)
+            .IsRequired();
+        // 1:N: um Contrato pode ter vários Pagamentos; cada Pagamento pertence a um Contrato.
         modelBuilder.Entity<Pagamento>()
             .HasOne(pagamento => pagamento.Contrato)
             .WithMany(contrato => contrato.Pagamentos)
             .HasForeignKey(pagamento => pagamento.ContratoId);
+        // N:N: Contrato e Veiculo são associados pela entidade de junção que também
+        // armazena ValorLocacao específico daquele veículo naquele contrato.
         modelBuilder.Entity<Contrato>()
             .HasMany(contrato => contrato.Veiculos)
             .WithMany(veiculo => veiculo.Contratos)

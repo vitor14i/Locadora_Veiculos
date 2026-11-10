@@ -91,7 +91,6 @@ public class Contrato
             return;
         }
 
-        Pagamentos.Add(pagamento);
         pagamento.AssociarContrato(this);
     }
 }

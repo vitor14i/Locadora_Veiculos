@@ -4,7 +4,9 @@ using Locadora_Veiculos.Interfaces;
 using Locadora_Veiculos.Models;
 using Locadora_Veiculos.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System.Windows;
 
 namespace Locadora_Veiculos
@@ -18,9 +20,16 @@ namespace Locadora_Veiculos
 
         public App()
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
             var services = new ServiceCollection();
 
-            services.AddDbContextFactory<AppDbContext>();
+            var connectionString = configuration.GetConnectionString("LocadoraDb")
+                ?? throw new InvalidOperationException("Connection string 'LocadoraDb' não encontrada.");
+            services.AddDbContextFactory<AppDbContext>(options => options.UseSqlServer(connectionString));
             services.AddSingleton<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
             services.AddOptions<TarifasConfig>();
 

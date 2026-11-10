@@ -82,7 +82,7 @@ public sealed class DevolucaoController
         contrato.DataDevolucao = dataDevolucaoUtc;
         contrato.DiasAtraso = diasAtraso;
         contrato.ValorMulta = contrato.Veiculos.Sum(veiculo =>
-            diasAtraso == 0 ? 0 : _calculadoraMulta.Calcular(veiculo.ValorDiaria, diasAtraso));
+            _calculadoraMulta.Calcular(veiculo.ValorDiaria, diasAtraso));
 
         foreach (var veiculo in contrato.Veiculos)
         {

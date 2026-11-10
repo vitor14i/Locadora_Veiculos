@@ -36,8 +36,6 @@ public class AuthController
         string email,
         string senha)
     {
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-
         if (string.IsNullOrWhiteSpace(email))
         {
             throw new ArgumentException("Informe um e-mail válido.", nameof(email));
@@ -49,6 +47,7 @@ public class AuthController
                 "A senha deve conter pelo menos 8 caracteres.", nameof(senha));
         }
 
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
         var usuario = await context.Usuarios
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(conta => conta.Email == email);

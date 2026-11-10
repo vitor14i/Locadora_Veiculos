@@ -46,6 +46,49 @@ public class RelatorioController
     }
 
     /// <summary>
+    /// Soma pagamentos de contratos finalizados (devolvidos) no mês informado, usando SQL nativo parametrizado.
+    /// </summary>
+    public async Task<FaturamentoMensal> ObterFaturamentoMensalAsync(int ano, int mes)
+    {
+        if (ano < 1 || ano > 9999)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ano));
+        }
+
+        if (mes is < 1 or > 12)
+        {
+            throw new ArgumentOutOfRangeException(nameof(mes));
+        }
+
+        var inicioMes = new DateTime(ano, mes, 1);
+        var inicioMesSeguinte = inicioMes.AddMonths(1);
+
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+
+        const string sql = """
+            SELECT @ano AS Ano,
+                   @mes AS Mes,
+                   COALESCE(SUM(p.Valor), 0) AS ValorTotal
+            FROM [Pagamentos] AS p
+            INNER JOIN [Contratos] AS c ON c.Id = p.ContratoId
+            WHERE p.Ativo = 1
+              AND c.Ativo = 1
+              AND c.DataDevolucao >= @inicioMes
+              AND c.DataDevolucao < @inicioMesSeguinte
+            """;
+
+        var resultados = await context.Database.SqlQueryRaw<FaturamentoMensal>(
+                sql,
+                new Microsoft.Data.SqlClient.SqlParameter("@ano", ano),
+                new Microsoft.Data.SqlClient.SqlParameter("@mes", mes),
+                new Microsoft.Data.SqlClient.SqlParameter("@inicioMes", inicioMes),
+                new Microsoft.Data.SqlClient.SqlParameter("@inicioMesSeguinte", inicioMesSeguinte))
+            .ToListAsync();
+
+        return resultados.Single();
+    }
+
+    /// <summary>
     /// Lista contratos ativos por SQL puro para atender consultas gerenciais específicas.
     /// </summary>
     public async Task<IReadOnlyList<Contrato>> ObterContratosAtivosComSqlPuroAsync()
