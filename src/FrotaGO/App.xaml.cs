@@ -1,5 +1,6 @@
 using System.Windows;
 using FrotaGO.Data;
+using FrotaGO.Views;
 using Microsoft.EntityFrameworkCore;
 
 namespace FrotaGO;
@@ -8,13 +9,15 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
+
         if (!TentarInicializarBanco())
         {
             Shutdown(1);
             return;
         }
 
-        base.OnStartup(e);
+        new MainWindow().Show();
     }
 
     /// <summary>Aplica migrations pendentes e popula o banco se estiver vazio.</summary>

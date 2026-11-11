@@ -1,9 +1,32 @@
 <Window x:Class="FrotaGO.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FrotaGO" Height="300" Width="480" WindowStartupLocation="CenterScreen">
-    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBlock Text="FrotaGO" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="TxtResumo" Margin="0,16,0,0" HorizontalAlignment="Center"/>
-    </StackPanel>
+        Title="FrotaGO" Width="1280" Height="720" MinWidth="1100" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource CorFundo}"
+        Foreground="{StaticResource CorTexto}"
+        FontFamily="{StaticResource FontePadrao}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabeçalho das telas internas -->
+        <Grid x:Name="Cabecalho" Grid.Row="0" MaxWidth="1140" Margin="70,32,70,0"
+              Visibility="Collapsed">
+            <Button Content="FrotaGO" FontSize="22" Style="{StaticResource BotaoLink}"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" Click="Logo_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="BotaoPerfil" Content="FG" ToolTip="Meu perfil"
+                        Style="{StaticResource BotaoCircular}" Margin="0,0,12,0"
+                        Click="Perfil_Click"/>
+                <Button Content="Sair" Style="{StaticResource BotaoSecundario}" Height="40"
+                        Click="Sair_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Tela atual -->
+        <ContentControl x:Name="AreaConteudo" Grid.Row="1"/>
+    </Grid>
 </Window>
