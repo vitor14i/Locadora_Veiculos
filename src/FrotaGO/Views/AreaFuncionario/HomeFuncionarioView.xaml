@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaFuncionario.HomeFuncionarioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1140" Margin="70,48,70,32">
+            <TextBlock x:Name="TextoSaudacao" Style="{StaticResource TextoSaudacao}"/>
+            <TextBlock x:Name="TextoResumo" Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,32"/>
+
+            <!-- Gestão: só para o gerente -->
+            <UniformGrid x:Name="LinhaGestao" Columns="4" Margin="-8,0,-8,16">
+                <Button Content="Veículos" Tag="Cadastre e atualize a frota"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Manutenções" Tag="Controle os serviços"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Atendentes" Tag="Gerencie a equipe"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Relatórios" Tag="Acompanhe os resultados"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            </UniformGrid>
+
+            <!-- Atendimento -->
+            <UniformGrid Columns="3" Margin="-8,0">
+                <Button Content="Nova reserva" Tag="Reserve para clientes na loja"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Registrar devolução" Tag="Encerre uma locação ativa"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Clientes" Tag="Cadastre e atualize clientes"
+                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            </UniformGrid>
+
+            <TextBlock Text="Visitas de hoje" Style="{StaticResource TextoSecao}"/>
+
+            <!-- Cabeçalho da tabela -->
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Horário" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="1" Text="Cliente" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="2" Text="Veículo" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="3" Text="Status" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="4" Text="Ação" Style="{StaticResource TextoCabecalhoTabela}"/>
+            </Grid>
+
+            <!-- Linhas -->
+            <ItemsControl x:Name="ListaVisitas">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource CorBorda}" BorderThickness="0,1,0,0" Padding="0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="1.3*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Horario}" Style="{StaticResource TextoTabela}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Cliente}" Style="{StaticResource TextoTabela}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Veiculo}" Style="{StaticResource TextoTabela}"/>
+                                <Border Grid.Column="3" Style="{StaticResource SeloFundo}">
+                                    <TextBlock Text="{Binding Status}" Style="{StaticResource SeloTexto}"/>
+                                </Border>
+                                <Button Grid.Column="4" Content="Iniciar locação →" FontSize="15"
+                                        Style="{StaticResource BotaoLink}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock x:Name="TextoSemVisitas" Text="Nenhuma visita agendada para hoje."
+                       Style="{StaticResource TextoSubtitulo}" Visibility="Collapsed"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

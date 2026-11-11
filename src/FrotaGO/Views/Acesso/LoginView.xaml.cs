@@ -13,6 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.Globalization;
+using FrotaGO.Views.AreaCliente;
+using FrotaGO.Views.AreaFuncionario;
+
 namespace FrotaGO.Views.Acesso;
 
 public partial class LoginView : UserControl
@@ -35,8 +39,28 @@ public partial class LoginView : UserControl
             return;
         }
 
-        // TODO: chamar ContaController.Login e abrir a home do perfil.
-        MostrarMensagem("O login ainda não está conectado ao sistema.");
+        // TODO: trocar por ContaController.Login quando estiver pronto.
+        EntrarTemporariamente(CampoEmail.Text.Trim().ToLowerInvariant());
+    }
+
+    /// <summary>Login provisório, sem verificar a senha, apenas para navegar entre as homes.</summary>
+    private static void EntrarTemporariamente(string email)
+    {
+        var nome = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(email.Split('@')[0]);
+
+        switch (email)
+        {
+            case "gerente@frotago.com":
+                Navegador.Entrar(nome, () => new HomeFuncionarioView(nome, ehGerente: true));
+                break;
+            case "ana@frotago.com":
+            case "bruno@frotago.com":
+                Navegador.Entrar(nome, () => new HomeFuncionarioView(nome, ehGerente: false));
+                break;
+            default:
+                Navegador.Entrar(nome, () => new HomeClienteView(nome));
+                break;
+        }
     }
 
     private void CriarConta_Click(object sender, RoutedEventArgs e) =>
