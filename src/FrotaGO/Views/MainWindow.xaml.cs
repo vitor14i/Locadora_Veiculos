@@ -10,7 +10,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Navegador.Iniciar(this);
-        Navegador.IrPara(new LoginView(), mostrarCabecalho: false);
+        Navegador.Sair();
     }
 
     public void ExibirTela(UserControl tela, bool mostrarCabecalho)
@@ -19,16 +19,14 @@ public partial class MainWindow : Window
         Cabecalho.Visibility = mostrarCabecalho ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void Logo_Click(object sender, RoutedEventArgs e)
-    {
-        // TODO (PR 2): voltar para a home do perfil logado.
-    }
+    public void DefinirIniciais(string iniciais) => BotaoPerfil.Content = iniciais;
+
+    private void Logo_Click(object sender, RoutedEventArgs e) => Navegador.IrParaHome();
 
     private void Perfil_Click(object sender, RoutedEventArgs e)
     {
         // TODO (PR 4): abrir a PerfilView.
     }
 
-    private void Sair_Click(object sender, RoutedEventArgs e) =>
-        Navegador.IrPara(new LoginView(), mostrarCabecalho: false);
+    private void Sair_Click(object sender, RoutedEventArgs e) => Navegador.Sair();
 }

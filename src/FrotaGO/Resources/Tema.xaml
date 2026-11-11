@@ -11,6 +11,13 @@
     <SolidColorBrush x:Key="CorBorda" Color="#3A3B40"/>
     <SolidColorBrush x:Key="CorErro" Color="#FF6B6B"/>
     <SolidColorBrush x:Key="CorSucesso" Color="#7CF08A"/>
+    <SolidColorBrush x:Key="CorTextoCardSecundario" Color="#4A4B50"/>
+    <SolidColorBrush x:Key="CorSeloAtivaFundo" Color="#C9F5CF"/>
+    <SolidColorBrush x:Key="CorSeloAtivaTexto" Color="#145A1E"/>
+    <SolidColorBrush x:Key="CorSeloAgendadaFundo" Color="#FFE7B3"/>
+    <SolidColorBrush x:Key="CorSeloAgendadaTexto" Color="#6B4A00"/>
+    <SolidColorBrush x:Key="CorSeloNeutroFundo" Color="#E1E1E4"/>
+    <SolidColorBrush x:Key="CorSeloNeutroTexto" Color="#3A3B40"/>
 
     <!-- Fonte -->
     <FontFamily x:Key="FontePadrao">pack://application:,,,/Resources/Fonts/#Urbanist</FontFamily>
@@ -195,4 +202,91 @@
         <Setter Property="CornerRadius" Value="24"/>
         <Setter Property="Padding" Value="24"/>
     </Style>
+
+    <!-- Textos das homes -->
+    <Style x:Key="TextoSaudacao" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="40"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+    <Style x:Key="TextoSecao" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Margin" Value="0,32,0,16"/>
+    </Style>
+    <Style x:Key="TextoCardDetalhe" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Margin" Value="0,2"/>
+        <Setter Property="Foreground" Value="{StaticResource CorTextoCardSecundario}"/>
+    </Style>
+    <Style x:Key="TextoCabecalhoTabela" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource CorTextoSecundario}"/>
+    </Style>
+    <Style x:Key="TextoTabela" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Selo de status: a cor muda conforme a propriedade Status do item exibido -->
+    <Style x:Key="SeloFundo" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="12,4"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{StaticResource CorSeloNeutroFundo}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Ativa">
+                <Setter Property="Background" Value="{StaticResource CorSeloAtivaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Agendada">
+                <Setter Property="Background" Value="{StaticResource CorSeloAgendadaFundo}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="SeloTexto" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource CorSeloNeutroTexto}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Ativa">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAtivaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Agendada">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAgendadaTexto}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Card de atalho: Content = título, Tag = descrição -->
+    <Style x:Key="CardAtalho" TargetType="Button">
+        <Setter Property="Height" Value="120"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Fundo" Background="{StaticResource CorCard}" CornerRadius="24" Padding="20">
+                        <Grid>
+                            <Border Width="32" Height="32" CornerRadius="16" BorderThickness="1"
+                                BorderBrush="{StaticResource CorTextoCardSecundario}"
+                                HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <TextBlock Text="↗" FontSize="14" Foreground="{StaticResource CorTextoCard}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Bottom">
+                                <TextBlock FontSize="20" Foreground="{StaticResource CorTextoCard}"
+                                       Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <TextBlock FontSize="13" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"
+                                       Foreground="{StaticResource CorTextoCardSecundario}"
+                                       Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Fundo" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
 </ResourceDictionary>

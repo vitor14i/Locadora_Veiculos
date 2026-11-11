@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="FrotaGO.Views.Componentes.CardReservaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Style="{StaticResource Card}" Height="190">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding Titulo}" FontSize="15"
+                       Foreground="{StaticResource CorTextoCardSecundario}"/>
+            <Border Style="{StaticResource SeloFundo}" HorizontalAlignment="Right">
+                <TextBlock Text="{Binding Status}" Style="{StaticResource SeloTexto}"/>
+            </Border>
+
+            <TextBlock Grid.Row="1" Text="{Binding Veiculo}" FontSize="30"
+                       Foreground="{StaticResource CorTextoCard}" TextTrimming="CharacterEllipsis"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <Grid Grid.Row="2">
+                <StackPanel>
+                    <TextBlock Text="{Binding Detalhe1}" Style="{StaticResource TextoCardDetalhe}"/>
+                    <TextBlock Text="{Binding Detalhe2}" Style="{StaticResource TextoCardDetalhe}"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding Detalhe3}" Style="{StaticResource TextoCardDetalhe}"
+                               HorizontalAlignment="Right"/>
+                    <Button Content="Ver detalhes →" FontSize="13" Style="{StaticResource BotaoLink}"
+                            Foreground="{StaticResource CorTextoCard}" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
