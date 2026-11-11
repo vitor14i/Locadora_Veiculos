@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="FrotaGO.Views.Acesso.CriarContaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,32">
+            <TextBlock Text="Crie sua conta" Style="{StaticResource TextoTitulo}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="Cadastre-se para reservar veículos e acompanhar suas locações."
+                       Style="{StaticResource TextoSubtitulo}"
+                       HorizontalAlignment="Center" Margin="0,8,0,24"/>
+
+            <!-- Seletor do tipo de cliente -->
+            <Border Background="{StaticResource CorCampo}" CornerRadius="22" Padding="4"
+                    HorizontalAlignment="Center" Margin="0,0,0,24">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="OpcaoPessoaFisica" Content="Pessoa física"
+                                 GroupName="TipoPessoa" IsChecked="True"
+                                 Style="{StaticResource OpcaoSegmentada}"
+                                 Checked="TipoPessoa_Checked"/>
+                    <RadioButton x:Name="OpcaoPessoaJuridica" Content="Pessoa jurídica"
+                                 GroupName="TipoPessoa"
+                                 Style="{StaticResource OpcaoSegmentada}"
+                                 Checked="TipoPessoa_Checked"/>
+                </StackPanel>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,16">
+                    <TextBlock x:Name="RotuloNome" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoNome"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock x:Name="RotuloDocumento" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoDocumento"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock x:Name="RotuloComplemento" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoComplemento"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="E-mail" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoEmail"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Telefone" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoTelefone"/>
+                </StackPanel>
+
+                <StackPanel x:Name="PainelEndereco" Grid.Row="3" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Endereço" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoEndereco"/>
+                </StackPanel>
+                <StackPanel x:Name="PainelNascimento" Grid.Row="3" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Data de nascimento" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoNascimento"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="4" Grid.Column="0">
+                    <TextBlock Text="Senha" Style="{StaticResource TextoRotulo}"/>
+                    <PasswordBox x:Name="CampoSenha"/>
+                </StackPanel>
+                <StackPanel Grid.Row="4" Grid.Column="2">
+                    <TextBlock Text="Confirmar senha" Style="{StaticResource TextoRotulo}"/>
+                    <PasswordBox x:Name="CampoConfirmarSenha"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                       Margin="0,12,0,0" Visibility="Collapsed"/>
+
+            <Button Content="Criar conta" Style="{StaticResource BotaoPrincipal}"
+                    Margin="0,24,0,0" Click="CriarConta_Click"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <TextBlock Text="Já tem uma conta? " Style="{StaticResource TextoSubtitulo}"/>
+                <Button Content="Entrar" FontSize="15" Style="{StaticResource BotaoLink}"
+                        Click="Entrar_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
