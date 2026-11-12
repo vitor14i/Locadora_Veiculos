@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaCliente.BuscaVeiculosView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1140" Margin="70,48,70,32">
+            <TextBlock Text="Reservar veículo" Style="{StaticResource TextoSaudacao}"/>
+            <TextBlock Text="Escolha o período para ver os veículos disponíveis."
+                       Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,32"/>
+
+            <!-- Filtros -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Retirada (dd/mm/aaaa hh:mm)" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoRetirada"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Devolução (dd/mm/aaaa hh:mm)" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoDevolucao"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Tipo" Style="{StaticResource TextoRotulo}"/>
+                    <Border Background="{StaticResource CorCampo}" CornerRadius="24" Padding="4">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="OpcaoTodos" Content="Todos" GroupName="Tipo" IsChecked="True"
+                                         Style="{StaticResource OpcaoSegmentada}"/>
+                            <RadioButton x:Name="OpcaoCarro" Content="Carro" GroupName="Tipo"
+                                         Style="{StaticResource OpcaoSegmentada}"/>
+                            <RadioButton x:Name="OpcaoMoto" Content="Moto" GroupName="Tipo"
+                                         Style="{StaticResource OpcaoSegmentada}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                <Button Grid.Column="6" Content="Buscar" Style="{StaticResource BotaoPrincipal}"
+                        VerticalAlignment="Bottom" IsDefault="True" Click="Buscar_Click"/>
+            </Grid>
+
+            <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                       Margin="0,12,0,0" Visibility="Collapsed"/>
+
+            <TextBlock x:Name="TextoResultado" Style="{StaticResource TextoSubtitulo}" Margin="0,32,0,16"
+                       Text="Informe o período para ver os veículos disponíveis."/>
+
+            <!-- Resultados -->
+            <ItemsControl x:Name="ListaVeiculos" Margin="-8,0" ButtonBase.Click="ListaVeiculos_Click">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="3"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <componentes:CardVeiculoView Margin="8"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

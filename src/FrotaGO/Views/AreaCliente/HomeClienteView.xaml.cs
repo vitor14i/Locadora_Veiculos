@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FrotaGO.Helpers;
 using FrotaGO.Views.Componentes;
+using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
@@ -25,7 +26,14 @@ public partial class HomeClienteView : UserControl
         TextoSaudacao.Text = $"Olá, {NomeHelper.PrimeiroNome(nomeCliente)}";
 
         // TODO: substituir pelos dados vindos do controller.
-        ExibirCards(CriarCardsDeExemplo());
+        var cards = DadosDeExemplo.Reservas
+        .Where(reserva => reserva.Status is "Ativa" or "Agendada")
+        .OrderBy(reserva => reserva.Retirada)
+        .Take(2)
+        .Select(DadosDeExemplo.CriarCard)
+        .ToList();
+
+        ExibirCards(cards);
     }
 
     private void ExibirCards(IReadOnlyList<CardReservaItem> cards)
@@ -49,19 +57,17 @@ public partial class HomeClienteView : UserControl
             : $"Você tem {string.Join(" e ", partes)}.";
     }
 
-    private static List<CardReservaItem> CriarCardsDeExemplo() =>
-    [
-        new()
+    private void ReservarVeiculo_Click(object sender, RoutedEventArgs e) =>
+    Navegador.IrPara(new BuscaVeiculosView());
+
+    private void MinhasReservas_Click(object sender, RoutedEventArgs e) =>
+        Navegador.IrPara(new MinhasReservasView());
+
+    private void ListaCards_Click(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is FrameworkElement { DataContext: CardReservaItem card })
         {
-            ReservaId = 1, Titulo = "Locação", Status = "Ativa", Veiculo = "Chevrolet Onix · 2024",
-            Detalhe1 = "Devolução: 15/11 às 14:00", Detalhe2 = "Pagamento: confirmado",
-            Detalhe3 = "Contrato: nº 1024"
-        },
-        new()
-        {
-            ReservaId = 2, Titulo = "Reserva", Status = "Agendada", Veiculo = "Fiat Pulse · 2025",
-            Detalhe1 = "Retirada: 16/11 às 15:00", Detalhe2 = "Devolução: 18/11 às 15:00",
-            Detalhe3 = "Valor estimado: R$ 1.500,00"
+            Navegador.IrPara(new DetalhesReservaView(card.ReservaId));
         }
-    ];
+    }
 }

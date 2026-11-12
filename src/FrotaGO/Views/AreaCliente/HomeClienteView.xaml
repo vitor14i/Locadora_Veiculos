@@ -10,12 +10,12 @@
                     <TextBlock x:Name="TextoResumo" Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button Content="Minhas reservas" Style="{StaticResource BotaoSecundario}" Margin="0,0,12,0"/>
-                    <Button Content="Reservar veículo" Style="{StaticResource BotaoPrincipal}"/>
+                    <Button Content="Minhas reservas" Style="{StaticResource BotaoSecundario}" Margin="0,0,12,0" Click="MinhasReservas_Click"/>
+                    <Button Content="Reservar veículo" Style="{StaticResource BotaoPrincipal}" Click="ReservarVeiculo_Click"/>
                 </StackPanel>
             </Grid>
 
-            <ItemsControl x:Name="ListaCards" Margin="-8,32,-8,0">
+            <ItemsControl x:Name="ListaCards" Margin="-8,32,-8,0" ButtonBase.Click="ListaCards_Click">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="2"/>

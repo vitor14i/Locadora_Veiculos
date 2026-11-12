@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="FrotaGO.Views.Componentes.ResumoReservaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Style="{StaticResource Card}">
+        <StackPanel>
+            <Grid>
+                <TextBlock Text="{Binding Tipo}" FontSize="15"
+                           Foreground="{StaticResource CorTextoCardSecundario}"/>
+                <TextBlock Text="{Binding Categoria}" FontSize="15" HorizontalAlignment="Right"
+                           Foreground="{StaticResource CorTextoCardSecundario}"/>
+            </Grid>
+
+            <TextBlock Text="{Binding Veiculo}" FontSize="30" Margin="0,24"
+                       Foreground="{StaticResource CorTextoCard}" HorizontalAlignment="Center"/>
+
+            <ItemsControl ItemsSource="{Binding Linhas}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,6">
+                            <TextBlock Text="{Binding Rotulo}" FontSize="15"
+                                       Foreground="{StaticResource CorTextoCardSecundario}"/>
+                            <TextBlock Text="{Binding Valor}" FontSize="15" HorizontalAlignment="Right"
+                                       Foreground="{StaticResource CorTextoCard}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border Height="1" Margin="0,12" Opacity="0.3"
+                    Background="{StaticResource CorTextoCardSecundario}"/>
+
+            <Grid>
+                <TextBlock Text="{Binding RotuloTotal}" FontSize="17" FontWeight="Medium"
+                           Foreground="{StaticResource CorTextoCard}"/>
+                <TextBlock Text="{Binding ValorTotal}" FontSize="17" FontWeight="Medium"
+                           Foreground="{StaticResource CorTextoCard}" HorizontalAlignment="Right"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

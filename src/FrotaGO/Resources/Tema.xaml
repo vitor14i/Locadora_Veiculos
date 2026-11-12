@@ -18,6 +18,8 @@
     <SolidColorBrush x:Key="CorSeloAgendadaTexto" Color="#6B4A00"/>
     <SolidColorBrush x:Key="CorSeloNeutroFundo" Color="#E1E1E4"/>
     <SolidColorBrush x:Key="CorSeloNeutroTexto" Color="#3A3B40"/>
+    <SolidColorBrush x:Key="CorSeloCanceladaFundo" Color="#F8D4D4"/>
+    <SolidColorBrush x:Key="CorSeloCanceladaTexto" Color="#7A1F1F"/>
 
     <!-- Fonte -->
     <FontFamily x:Key="FontePadrao">pack://application:,,,/Resources/Fonts/#Urbanist</FontFamily>
@@ -240,6 +242,12 @@
             <DataTrigger Binding="{Binding Status}" Value="Agendada">
                 <Setter Property="Background" Value="{StaticResource CorSeloAgendadaFundo}"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Cancelada">
+                <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Expirada">
+                <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="SeloTexto" TargetType="TextBlock">
@@ -251,6 +259,12 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="Agendada">
                 <Setter Property="Foreground" Value="{StaticResource CorSeloAgendadaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Cancelada">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Expirada">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
