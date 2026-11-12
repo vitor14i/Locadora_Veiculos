@@ -10,21 +10,53 @@ public partial class BuscaVeiculosView : UserControl
 {
     private DateTime _retirada;
     private DateTime _devolucao;
+    private readonly bool _modoFuncionario;
 
     /// <summary>Se o período for informado, por exemplo ao voltar da revisão, a busca é refeita.</summary>
-    public BuscaVeiculosView(DateTime? retirada = null, DateTime? devolucao = null)
+    public BuscaVeiculosView(DateTime? retirada = null, DateTime? devolucao = null, bool modoFuncionario = false, ClienteExemplo? cliente = null)
     {
         InitializeComponent();
+        _modoFuncionario = modoFuncionario;
 
-        var retiradaPadrao = DateTime.Today.AddDays(1).AddHours(10);
+        if (modoFuncionario)
+        {
+            ConfigurarModoFuncionario(cliente);
+        }
+
+        // No balcão, a retirada é logo em seguida. O cliente reserva a partir do dia seguinte.
+        var retiradaPadrao = modoFuncionario
+            ? ProximaMeiaHora(DateTime.Now)
+            : DateTime.Today.AddDays(1).AddHours(10);
+
         CampoRetirada.Text = FormatoHelper.DataHoraCampo(retirada ?? retiradaPadrao);
         CampoDevolucao.Text = FormatoHelper.DataHoraCampo(devolucao ?? retiradaPadrao.AddDays(3));
+
+        var erro = _modoFuncionario && ClienteSelecionado is null
+            ? "Escolha o cliente."
+            : LerPeriodo();
 
         if (retirada.HasValue && devolucao.HasValue)
         {
             Buscar();
         }
     }
+
+    private ClienteExemplo? ClienteSelecionado =>
+    _modoFuncionario ? CampoCliente.SelectedItem as ClienteExemplo : null;
+
+    private void ConfigurarModoFuncionario(ClienteExemplo? cliente)
+    {
+        TituloTela.Text = "Nova reserva";
+        SubtituloTela.Text = "Escolha o cliente, o período e o veículo.";
+        PainelCliente.Visibility = Visibility.Visible;
+
+        // TODO: trocar pela lista de clientes vinda do controller.
+        CampoCliente.ItemsSource = DadosDeExemplo.Clientes;
+        CampoCliente.SelectedItem = cliente;
+    }
+
+    private static DateTime ProximaMeiaHora(DateTime data) =>
+        data.Date.AddHours(data.Hour).AddMinutes(data.Minute < 30 ? 30 : 60);
 
     private string? TipoSelecionado =>
         OpcaoCarro.IsChecked == true ? "Carro" :
@@ -83,7 +115,7 @@ public partial class BuscaVeiculosView : UserControl
     {
         if (e.OriginalSource is FrameworkElement { DataContext: VeiculoItem veiculo })
         {
-            Navegador.IrPara(new RevisarReservaView(veiculo, _retirada, _devolucao));
+            Navegador.IrPara(new RevisarReservaView(veiculo, _retirada, _devolucao, ClienteSelecionado));
         }
     }
 

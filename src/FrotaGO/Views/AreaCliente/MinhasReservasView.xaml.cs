@@ -44,7 +44,7 @@ public partial class MinhasReservasView : UserControl
     private void ExibirReservas()
     {
         // TODO: trocar pelas reservas do cliente logado vindas do controller.
-        var cards = DadosDeExemplo.Reservas
+        var cards = DadosDeExemplo.ReservasDoClienteAtual()
             .Where(reserva => _filtro == FiltroTodas || StatusPorFiltro[_filtro].Contains(reserva.Status))
             .OrderBy(reserva => reserva.Status is "Ativa" or "Agendada" ? 0 : 1)
             .ThenByDescending(reserva => reserva.Retirada)
@@ -52,9 +52,9 @@ public partial class MinhasReservasView : UserControl
             .ToList();
 
         ListaCards.ItemsSource = cards;
-        TextoVazio.Text = DadosDeExemplo.Reservas.Count == 0
-            ? "Você ainda não tem reservas."
-            : "Nenhuma reserva com esse status.";
+        TextoVazio.Text = DadosDeExemplo.ReservasDoClienteAtual().Any()
+            ? "Nenhuma reserva com esse status."
+            : "Você ainda não tem reservas.";
         TextoVazio.Visibility = cards.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 

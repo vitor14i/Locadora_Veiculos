@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaFuncionario.LocacoesAtivasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1140" Margin="70,48,70,32">
+            <TextBlock Text="Locações ativas" Style="{StaticResource TextoSaudacao}"/>
+            <TextBlock Text="Escolha a locação que será devolvida."
+                       Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,32"/>
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.6*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Contrato" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="1" Text="Cliente" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="2" Text="Veículo" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="3" Text="Devolução prevista" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="4" Text="Situação" Style="{StaticResource TextoCabecalhoTabela}"/>
+                <TextBlock Grid.Column="5" Text="Ação" Style="{StaticResource TextoCabecalhoTabela}"/>
+            </Grid>
+
+            <ItemsControl x:Name="ListaLocacoes" ButtonBase.Click="ListaLocacoes_Click">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource CorBorda}" BorderThickness="0,1,0,0" Padding="0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="1.6*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Contrato}" Style="{StaticResource TextoTabela}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Cliente}" Style="{StaticResource TextoTabela}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Veiculo}" Style="{StaticResource TextoTabela}"/>
+                                <TextBlock Grid.Column="3" Text="{Binding DevolucaoPrevista}" Style="{StaticResource TextoTabela}"/>
+                                <Border Grid.Column="4" Style="{StaticResource SeloFundo}">
+                                    <TextBlock Text="{Binding Status}" Style="{StaticResource SeloTexto}"/>
+                                </Border>
+                                <Button Grid.Column="5" Content="Registrar devolução →" FontSize="15"
+                                        Style="{StaticResource BotaoLink}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock x:Name="TextoVazio" Text="Nenhuma locação ativa no momento."
+                       Style="{StaticResource TextoSubtitulo}" Visibility="Collapsed"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

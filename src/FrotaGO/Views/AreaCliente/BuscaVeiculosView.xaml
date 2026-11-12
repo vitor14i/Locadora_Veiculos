@@ -4,9 +4,16 @@
              xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel MaxWidth="1140" Margin="70,48,70,32">
-            <TextBlock Text="Reservar veículo" Style="{StaticResource TextoSaudacao}"/>
-            <TextBlock Text="Escolha o período para ver os veículos disponíveis."
+            <TextBlock x:Name="TituloTela" Text="Reservar veículo" Style="{StaticResource TextoSaudacao}"/>
+            <TextBlock x:Name="SubtituloTela" Text="Escolha o período para ver os veículos disponíveis."
                        Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,32"/>
+
+            <!-- Cliente: só no modo funcionário -->
+            <StackPanel x:Name="PainelCliente" Margin="0,0,0,16" Visibility="Collapsed">
+                <TextBlock Text="Cliente" Style="{StaticResource TextoRotulo}"/>
+                <ComboBox x:Name="CampoCliente" DisplayMemberPath="Descricao"
+                          Width="560" HorizontalAlignment="Left"/>
+            </StackPanel>
 
             <!-- Filtros -->
             <Grid>

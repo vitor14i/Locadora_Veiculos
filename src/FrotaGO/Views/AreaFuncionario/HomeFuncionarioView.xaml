@@ -19,12 +19,13 @@
             </UniformGrid>
 
             <!-- Atendimento -->
+            
             <UniformGrid Columns="3" Margin="-8,0">
-                <Button Content="Nova reserva" Tag="Reserve para clientes na loja"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
-                <Button Content="Registrar devolução" Tag="Encerre uma locação ativa"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
-                <Button Content="Clientes" Tag="Cadastre e atualize clientes"
+                <Button Content="Nova reserva" Tag="Reserve para clientes na loja" 
+                        Style="{StaticResource CardAtalho}" Margin="8,0" Click="NovaReserva_Click"/>
+                <Button Content="Registrar devolução" Tag="Encerre uma locação ativa" 
+                        Style="{StaticResource CardAtalho}" Margin="8,0" Click="RegistrarDevolucao_Click"/>
+                <Button Content="Clientes" Tag="Cadastre e atualize clientes" 
                         Style="{StaticResource CardAtalho}" Margin="8,0"/>
             </UniformGrid>
 
@@ -47,7 +48,7 @@
             </Grid>
 
             <!-- Linhas -->
-            <ItemsControl x:Name="ListaVisitas">
+            <ItemsControl x:Name="ListaVisitas" ButtonBase.Click="ListaVisitas_Click">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="{StaticResource CorBorda}" BorderThickness="0,1,0,0" Padding="0,14">

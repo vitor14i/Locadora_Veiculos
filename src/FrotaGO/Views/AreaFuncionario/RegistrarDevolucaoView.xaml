@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaFuncionario.RegistrarDevolucaoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+            <TextBlock Text="Registrar devolução" Style="{StaticResource TextoTitulo}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Faça a vistoria e confira as cobranças." Style="{StaticResource TextoSubtitulo}"
+                       HorizontalAlignment="Center" Margin="0,8,0,24"/>
+
+            <componentes:ResumoReservaView x:Name="Resumo"/>
+
+            <!-- Vistoria -->
+            <TextBlock Text="Vistoria" Style="{StaticResource TextoSecao}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Devolução (dd/mm/aaaa hh:mm)" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoDataDevolucao" TextChanged="Campo_TextChanged"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Quilometragem de chegada" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoKmChegada" TextChanged="Campo_TextChanged"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="Observações" Style="{StaticResource TextoRotulo}" Margin="0,16,0,8"/>
+            <TextBox x:Name="CampoObservacoes"/>
+
+            <CheckBox x:Name="CampoAvaria" Content="Registrar avaria" Margin="0,16,0,0"
+                      Checked="Avaria_Alterada" Unchecked="Avaria_Alterada"/>
+            <StackPanel x:Name="PainelAvaria" Margin="0,12,0,0" Visibility="Collapsed">
+                <TextBlock Text="Valor da avaria" Style="{StaticResource TextoRotulo}"/>
+                <TextBox x:Name="CampoValorAvaria" TextChanged="Campo_TextChanged"/>
+            </StackPanel>
+
+            <CheckBox x:Name="CampoManutencao" Content="Enviar veículo para manutenção" Margin="0,12,0,0"/>
+
+            <!-- Cobranças -->
+            <TextBlock Text="Multas" Style="{StaticResource TextoSecao}"/>
+            <Border Background="{StaticResource CorCampo}" CornerRadius="16" Padding="20">
+                <StackPanel>
+                    <ItemsControl x:Name="ListaMultas">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <TextBlock Text="{Binding Rotulo}" FontSize="15"
+                                               Foreground="{StaticResource CorTextoSecundario}"/>
+                                    <TextBlock Text="{Binding Valor}" FontSize="15" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="TextoSemMultas" Text="Nenhuma multa nesta devolução."
+                               Style="{StaticResource TextoSubtitulo}"/>
+                    <Border Height="1" Background="{StaticResource CorBorda}" Margin="0,12"/>
+                    <Grid>
+                        <TextBlock Text="Total de multas" FontSize="17" FontWeight="Medium"/>
+                        <TextBlock x:Name="TextoTotalMultas" FontSize="17" FontWeight="Medium"
+                                   HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Pagamento das multas -->
+            <StackPanel x:Name="PainelPagamento" Visibility="Collapsed">
+                <TextBlock Text="Pagamento das multas" Style="{StaticResource TextoSecao}"/>
+                <componentes:PagamentoView x:Name="SecaoPagamento"/>
+            </StackPanel>
+
+            <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                       Margin="0,16,0,0" Visibility="Collapsed"/>
+
+            <Grid Margin="0,24,0,0">
+                <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
+                        HorizontalAlignment="Left" Click="Voltar_Click"/>
+                <Button Content="Concluir devolução" Style="{StaticResource BotaoPrincipal}"
+                        HorizontalAlignment="Right" Click="ConcluirDevolucao_Click"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

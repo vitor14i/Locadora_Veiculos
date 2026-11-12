@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaFuncionario.IniciarLocacaoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+            <TextBlock Text="Iniciar locação" Style="{StaticResource TextoTitulo}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Confira os dados e registre o pagamento." Style="{StaticResource TextoSubtitulo}"
+                       HorizontalAlignment="Center" Margin="0,8,0,24"/>
+
+            <componentes:ResumoReservaView x:Name="Resumo"/>
+
+            <TextBlock Text="Retirada" Style="{StaticResource TextoSecao}"/>
+            <TextBlock Text="Quilometragem de saída" Style="{StaticResource TextoRotulo}"/>
+            <TextBox x:Name="CampoKmSaida"/>
+            <CheckBox x:Name="CampoDocumentos" Margin="0,16,0,0"
+                      Content="Documento com foto e CNH do condutor conferidos"/>
+
+            <TextBlock Text="Pagamento" Style="{StaticResource TextoSecao}"/>
+            <componentes:PagamentoView x:Name="SecaoPagamento"/>
+
+            <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                       Margin="0,16,0,0" Visibility="Collapsed"/>
+
+            <Grid Margin="0,24,0,0">
+                <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
+                        HorizontalAlignment="Left" Click="Voltar_Click"/>
+                <Button Content="Iniciar locação" Style="{StaticResource BotaoPrincipal}"
+                        HorizontalAlignment="Right" Click="IniciarLocacao_Click"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
