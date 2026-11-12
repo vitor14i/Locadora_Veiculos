@@ -248,6 +248,12 @@
             <DataTrigger Binding="{Binding Status}" Value="Expirada">
                 <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em dia">
+                <Setter Property="Background" Value="{StaticResource CorSeloAtivaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Atrasada">
+                <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="SeloTexto" TargetType="TextBlock">
@@ -264,6 +270,12 @@
                 <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="Expirada">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em dia">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAtivaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Atrasada">
                 <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
             </DataTrigger>
         </Style.Triggers>
@@ -302,5 +314,50 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <!-- Caixas de seleção: sem isso, o texto fica preto no fundo escuro -->
+    <Style TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource CorTexto}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Listas suspensas: mantêm o visual do Windows, com o tamanho dos outros campos -->
+    <Style TargetType="ComboBox">
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="16,0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Opção de pagamento em formato de card -->
+    <Style x:Key="OpcaoPagamento" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource CorTexto}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Fundo" Background="{StaticResource CorCampo}" CornerRadius="16"
+                        BorderBrush="{StaticResource CorBorda}" BorderThickness="1" Padding="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse x:Name="Marcador" Width="16" Height="16" Margin="0,0,12,0"
+                                 Stroke="{StaticResource CorTextoSecundario}" StrokeThickness="2"/>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Fundo" Property="BorderBrush" Value="{StaticResource CorTexto}"/>
+                            <Setter TargetName="Marcador" Property="Stroke" Value="{StaticResource CorTexto}"/>
+                            <Setter TargetName="Marcador" Property="Fill" Value="{StaticResource CorTexto}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

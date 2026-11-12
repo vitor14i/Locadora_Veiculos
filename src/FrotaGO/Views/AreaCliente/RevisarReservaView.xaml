@@ -6,19 +6,19 @@
         <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
             <TextBlock Text="Revise sua reserva" Style="{StaticResource TextoTitulo}"
                        HorizontalAlignment="Center"/>
-            <TextBlock Text="Confira os dados antes de agendar a retirada."
+            <TextBlock x:Name="SubtituloTela" Text="Confira os dados antes de agendar a retirada." 
                        Style="{StaticResource TextoSubtitulo}" HorizontalAlignment="Center" Margin="0,8,0,24"/>
 
             <componentes:ResumoReservaView x:Name="Resumo"/>
 
-            <TextBlock Text="O pagamento é feito na retirada. Leve um documento com foto e sua CNH."
+            <TextBlock x:Name="TextoAviso" Text="O pagamento é feito na retirada. Leve um documento com foto e sua CNH." 
                        Style="{StaticResource TextoSubtitulo}" TextWrapping="Wrap" Margin="0,16,0,0"/>
 
             <Grid Margin="0,24,0,0">
                 <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
                         HorizontalAlignment="Left" Click="Voltar_Click"/>
-                <Button Content="Agendar retirada" Style="{StaticResource BotaoPrincipal}"
-                        HorizontalAlignment="Right" Click="AgendarRetirada_Click"/>
+                <Button x:Name="BotaoConfirmar" Content="Agendar retirada" Style="{StaticResource BotaoPrincipal}" 
+                        HorizontalAlignment="Right" Click="Confirmar_Click"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

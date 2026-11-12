@@ -1,4 +1,8 @@
-﻿using System;
+﻿using FrotaGO.Helpers;
+using FrotaGO.Views.AreaCliente;
+using FrotaGO.Views.Componentes;
+using FrotaGO.Views.Exemplos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using FrotaGO.Helpers;
-using FrotaGO.Views.Componentes;
 
 namespace FrotaGO.Views.AreaFuncionario;
 
@@ -26,7 +28,7 @@ public partial class HomeFuncionarioView : UserControl
         LinhaGestao.Visibility = ehGerente ? Visibility.Visible : Visibility.Collapsed;
 
         // TODO: substituir pelas visitas do dia vindas do controller.
-        ExibirVisitas(CriarVisitasDeExemplo());
+        ExibirVisitas(DadosDeExemplo.VisitasDeHoje());
     }
 
     private void ExibirVisitas(IReadOnlyList<VisitaItem> visitas)
@@ -40,10 +42,17 @@ public partial class HomeFuncionarioView : UserControl
             _ => $"Você tem {visitas.Count} visitas agendadas para hoje."
         };
     }
+    private void NovaReserva_Click(object sender, RoutedEventArgs e) =>
+    Navegador.IrPara(new BuscaVeiculosView(modoFuncionario: true));
 
-    private static List<VisitaItem> CriarVisitasDeExemplo() =>
-    [
-        new() { ReservaId = 3, Horario = "09:00", Cliente = "Maria Silva", Veiculo = "BYD Dolphin · 2025", Status = "Agendada" },
-        new() { ReservaId = 4, Horario = "10:30", Cliente = "João Souza", Veiculo = "Honda NS 160 · 2024", Status = "Agendada" }
-    ];
+    private void RegistrarDevolucao_Click(object sender, RoutedEventArgs e) =>
+        Navegador.IrPara(new LocacoesAtivasView());
+
+    private void ListaVisitas_Click(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is FrameworkElement { DataContext: VisitaItem visita })
+        {
+            Navegador.IrPara(new IniciarLocacaoView(visita.ReservaId));
+        }
+    }
 }

@@ -27,5 +27,12 @@ public static class FormatoHelper
 
     public static string Quantidade(int quantidade, string singular, string plural) =>
         $"{quantidade} {(quantidade == 1 ? singular : plural)}";
+
+    public static bool TentarLerQuilometragem(string texto, out decimal km) =>
+        decimal.TryParse(texto.Replace(".", "").Trim(), NumberStyles.None,
+                         CultureInfo.InvariantCulture, out km);
+
+    public static bool TentarLerValor(string texto, out decimal valor) =>
+        decimal.TryParse(texto.Replace("R$", "").Trim(), NumberStyles.Number, PtBr, out valor);
 }
 

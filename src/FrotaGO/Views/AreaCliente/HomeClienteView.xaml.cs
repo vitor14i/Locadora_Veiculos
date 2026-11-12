@@ -26,7 +26,7 @@ public partial class HomeClienteView : UserControl
         TextoSaudacao.Text = $"Olá, {NomeHelper.PrimeiroNome(nomeCliente)}";
 
         // TODO: substituir pelos dados vindos do controller.
-        var cards = DadosDeExemplo.Reservas
+        var cards = DadosDeExemplo.ReservasDoClienteAtual()
         .Where(reserva => reserva.Status is "Ativa" or "Agendada")
         .OrderBy(reserva => reserva.Retirada)
         .Take(2)
