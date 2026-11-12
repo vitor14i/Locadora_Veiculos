@@ -44,24 +44,40 @@
             <TextBlock Text="Multas" Style="{StaticResource TextoSecao}"/>
             <Border Background="{StaticResource CorCampo}" CornerRadius="16" Padding="20">
                 <StackPanel>
-                    <ItemsControl x:Name="ListaMultas">
+                    <ItemsControl x:Name="ListaMultas" ButtonBase.Click="ListaMultas_Click">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,4">
-                                    <TextBlock Text="{Binding Rotulo}" FontSize="15"
-                                               Foreground="{StaticResource CorTextoSecundario}"/>
-                                    <TextBlock Text="{Binding Valor}" FontSize="15" HorizontalAlignment="Right"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Motivo}" FontSize="15"
+                                   Foreground="{StaticResource CorTextoSecundario}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Valor}" FontSize="15"/>
+                                    <Button Grid.Column="2" Content="{Binding Acao}" FontSize="13" Margin="16,0,0,0"
+                                Style="{StaticResource BotaoLink}" VerticalAlignment="Center"
+                                Visibility="{Binding PodeGerenciar, Converter={StaticResource BoolParaVisibilidade}}"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <TextBlock x:Name="TextoSemMultas" Text="Nenhuma multa nesta devolução."
-                               Style="{StaticResource TextoSubtitulo}"/>
+                   Style="{StaticResource TextoSubtitulo}"/>
+
+                    <!-- Desconto: só para o gerente -->
+                    <StackPanel x:Name="PainelDesconto" Margin="0,16,0,0" Visibility="Collapsed">
+                        <TextBlock Text="Desconto (R$)" Style="{StaticResource TextoRotulo}"/>
+                        <TextBox x:Name="CampoDesconto" Width="240" HorizontalAlignment="Left"
+                     TextChanged="Campo_TextChanged"/>
+                    </StackPanel>
+
                     <Border Height="1" Background="{StaticResource CorBorda}" Margin="0,12"/>
                     <Grid>
                         <TextBlock Text="Total de multas" FontSize="17" FontWeight="Medium"/>
                         <TextBlock x:Name="TextoTotalMultas" FontSize="17" FontWeight="Medium"
-                                   HorizontalAlignment="Right"/>
+                       HorizontalAlignment="Right"/>
                     </Grid>
                 </StackPanel>
             </Border>

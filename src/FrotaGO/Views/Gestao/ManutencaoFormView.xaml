@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="FrotaGO.Views.Gestao.ManutencaoFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+        <TextBlock Text="Nova manutenção" Style="{StaticResource TextoTitulo}" HorizontalAlignment="Center"/>
+        <TextBlock Text="O veículo fica indisponível para reservas até a manutenção ser finalizada."
+                   Style="{StaticResource TextoSubtitulo}" HorizontalAlignment="Center" Margin="0,8,0,24"/>
+
+        <TextBlock Text="Veículo" Style="{StaticResource TextoRotulo}"/>
+        <ComboBox x:Name="CampoVeiculo">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <Run Text="{Binding Marca, Mode=OneWay}"/> <Run Text="{Binding Modelo, Mode=OneWay}"/> · <Run Text="{Binding Placa, Mode=OneWay}"/>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Descrição do serviço" Style="{StaticResource TextoRotulo}" Margin="0,16,0,8"/>
+        <TextBox x:Name="CampoDescricao"/>
+
+        <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                   Margin="0,16,0,0" Visibility="Collapsed"/>
+
+        <Grid Margin="0,24,0,0">
+            <Button Content="Cancelar" Style="{StaticResource BotaoSecundario}"
+                    HorizontalAlignment="Left" Click="Cancelar_Click"/>
+            <Button Content="Iniciar manutenção" Style="{StaticResource BotaoPrincipal}"
+                    HorizontalAlignment="Right" Click="Iniciar_Click"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

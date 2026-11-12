@@ -16,11 +16,20 @@ public static class Navegador
         Janela.ExibirTela(tela, mostrarCabecalho);
 
     /// <summary>Registra a home do usuário logado e abre essa tela.</summary>
-    public static void Entrar(string nomeUsuario, Func<UserControl> criarHome)
+
+    public static UsuarioSessao? Usuario { get; private set; }
+
+    public static void Entrar(UsuarioSessao usuario, Func<UserControl> criarHome)
     {
         _criarHome = criarHome;
-        Janela.DefinirIniciais(NomeHelper.Iniciais(nomeUsuario));
+        AtualizarUsuario(usuario);
         IrParaHome();
+    }
+
+    public static void AtualizarUsuario(UsuarioSessao usuario)
+    {
+        Usuario = usuario;
+        Janela.DefinirIniciais(NomeHelper.Iniciais(usuario.Nome));
     }
 
     public static void IrParaHome()
@@ -33,6 +42,7 @@ public static class Navegador
 
     public static void Sair()
     {
+        Usuario = null;
         _criarHome = null;
         IrPara(new LoginView(), mostrarCabecalho: false);
     }

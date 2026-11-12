@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="FrotaGO.Views.Acesso.PerfilView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+            <TextBlock Text="Meu perfil" Style="{StaticResource TextoTitulo}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Atualize seus dados e sua senha." Style="{StaticResource TextoSubtitulo}"
+                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
+
+            <!-- Dados pessoais -->
+            <TextBlock Text="Dados pessoais" Style="{StaticResource TextoSecao}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Nome" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoNome"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="E-mail" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoEmail"/>
+                </StackPanel>
+                <StackPanel x:Name="PainelTelefone" Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="Telefone" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoTelefone"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2">
+                    <TextBlock x:Name="RotuloInfo" Style="{StaticResource TextoRotulo}"/>
+                    <!-- Dado só para leitura: aparece como texto, sem caixa de campo -->
+                    <TextBlock x:Name="TextoInfo" FontSize="15" Margin="0,14,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="MensagemDados" Style="{StaticResource TextoMensagem}"
+                       Margin="0,12,0,0" Visibility="Collapsed"/>
+            <Button Content="Salvar alterações" Style="{StaticResource BotaoPrincipal}"
+                    HorizontalAlignment="Right" Margin="0,16,0,0" Click="SalvarDados_Click"/>
+
+            <!-- Senha -->
+            <TextBlock Text="Alterar senha" Style="{StaticResource TextoSecao}"/>
+            <TextBlock Text="Senha atual" Style="{StaticResource TextoRotulo}"/>
+            <PasswordBox x:Name="CampoSenhaAtual"/>
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Nova senha" Style="{StaticResource TextoRotulo}"/>
+                    <PasswordBox x:Name="CampoNovaSenha"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Confirmar nova senha" Style="{StaticResource TextoRotulo}"/>
+                    <PasswordBox x:Name="CampoConfirmarSenha"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="MensagemSenha" Style="{StaticResource TextoMensagem}"
+                       Margin="0,12,0,0" Visibility="Collapsed"/>
+            <Button Content="Alterar senha" Style="{StaticResource BotaoPrincipal}"
+                    HorizontalAlignment="Right" Margin="0,16,0,0" Click="AlterarSenha_Click"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

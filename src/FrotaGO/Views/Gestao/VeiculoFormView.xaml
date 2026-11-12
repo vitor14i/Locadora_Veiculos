@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="FrotaGO.Views.Gestao.VeiculoFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+            <TextBlock x:Name="TituloTela" Text="Novo veículo" Style="{StaticResource TextoTitulo}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="Preencha os dados do veículo." Style="{StaticResource TextoSubtitulo}"
+                       HorizontalAlignment="Center" Margin="0,8,0,24"/>
+
+            <Border x:Name="SeletorTipo" Background="{StaticResource CorCampo}" CornerRadius="22" Padding="4"
+                    HorizontalAlignment="Center" Margin="0,0,0,24">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="OpcaoCarro" Content="Carro" GroupName="TipoVeiculo" IsChecked="True"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Tipo_Checked"/>
+                    <RadioButton x:Name="OpcaoMoto" Content="Moto" GroupName="TipoVeiculo"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Tipo_Checked"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Dados comuns -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Placa" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoPlaca" MaxLength="7"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Marca" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoMarca"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Modelo" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoModelo"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Ano" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoAno" MaxLength="4"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Quilometragem" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoKm"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Valor da diária (R$)" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoDiaria"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Só para carro -->
+            <Grid x:Name="PainelCarro">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,16">
+                    <TextBlock Text="Categoria" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoCategoria"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
+                    <TextBlock Text="Número de portas" Style="{StaticResource TextoRotulo}"/>
+                    <TextBox x:Name="CampoPortas" MaxLength="1"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0">
+                    <TextBlock Text="Câmbio" Style="{StaticResource TextoRotulo}"/>
+                    <Border Background="{StaticResource CorCampo}" CornerRadius="24" Padding="4"
+                            HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="OpcaoManual" Content="Manual" GroupName="Cambio" IsChecked="True"
+                                         Style="{StaticResource OpcaoSegmentada}"/>
+                            <RadioButton x:Name="OpcaoAutomatico" Content="Automático" GroupName="Cambio"
+                                         Style="{StaticResource OpcaoSegmentada}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Só para moto -->
+            <StackPanel x:Name="PainelMoto" Width="348" HorizontalAlignment="Left" Visibility="Collapsed">
+                <TextBlock Text="Cilindradas" Style="{StaticResource TextoRotulo}"/>
+                <TextBox x:Name="CampoCilindradas" MaxLength="4"/>
+            </StackPanel>
+
+            <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
+                       Margin="0,16,0,0" Visibility="Collapsed"/>
+
+            <Grid Margin="0,24,0,0">
+                <Button Content="Cancelar" Style="{StaticResource BotaoSecundario}"
+                        HorizontalAlignment="Left" Click="Cancelar_Click"/>
+                <Button Content="Salvar veículo" Style="{StaticResource BotaoPrincipal}"
+                        HorizontalAlignment="Right" Click="Salvar_Click"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

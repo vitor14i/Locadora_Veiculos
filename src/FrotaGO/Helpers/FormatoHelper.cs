@@ -34,5 +34,16 @@ public static class FormatoHelper
 
     public static bool TentarLerValor(string texto, out decimal valor) =>
         decimal.TryParse(texto.Replace("R$", "").Trim(), NumberStyles.Number, PtBr, out valor);
+
+    public const string FormatoData = "dd/MM/yyyy";
+
+    public static string ValorCampo(decimal valor) => valor.ToString("0.00", PtBr);
+
+    public static string DataCampo(DateTime data) =>
+        data.ToString(FormatoData, CultureInfo.InvariantCulture);
+
+    public static bool TentarLerData(string texto, out DateTime data) =>
+        DateTime.TryParseExact(texto.Trim(), FormatoData, CultureInfo.InvariantCulture,
+                               DateTimeStyles.None, out data);
 }
 

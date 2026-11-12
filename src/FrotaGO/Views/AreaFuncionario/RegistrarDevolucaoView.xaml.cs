@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using FrotaGO.Helpers;
 using FrotaGO.Models;
+using FrotaGO.Models.Enums;
 using FrotaGO.Views.Componentes;
 using FrotaGO.Views.Exemplos;
 
@@ -14,7 +15,13 @@ public partial class RegistrarDevolucaoView : UserControl
     private const decimal ValorPorKmExcedente = 1.00m;
 
     private readonly ReservaExemplo _reserva;
+
+    /// <summary>Tipos de multa cancelados pelo gerente, como "Atraso" ou "Avaria".</summary>
+    private readonly HashSet<string> _multasCanceladas = [];
+
     private List<Multa> _multas = [];
+    private decimal _desconto;
+    private decimal _total;
 
     public RegistrarDevolucaoView(int reservaId)
     {
@@ -34,6 +41,8 @@ public partial class RegistrarDevolucaoView : UserControl
         Recalcular();
     }
 
+    private static bool UsuarioEhGerente => Navegador.Usuario?.EhGerente == true;
+
     private void Campo_TextChanged(object sender, TextChangedEventArgs e) => Recalcular();
 
     private void Avaria_Alterada(object sender, RoutedEventArgs e) => Recalcular();
@@ -45,17 +54,32 @@ public partial class RegistrarDevolucaoView : UserControl
         if (!IsInitialized) return;
 
         PainelAvaria.Visibility = CampoAvaria.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        PainelDesconto.Visibility = UsuarioEhGerente ? Visibility.Visible : Visibility.Collapsed;
 
         _multas = CalcularMultas();
-        var total = _multas.Sum(multa => multa.Valor);
+        foreach (var multa in _multas.Where(multa => _multasCanceladas.Contains(Chave(multa))))
+        {
+            multa.Cancelar();
+        }
+
+        var subtotal = _multas.Where(multa => multa.Status != StatusMulta.Cancelada).Sum(multa => multa.Valor);
+        _desconto = UsuarioEhGerente && FormatoHelper.TentarLerValor(CampoDesconto.Text, out var desconto)
+            ? desconto
+            : 0;
+        _total = Math.Max(0, subtotal - _desconto);
 
         ListaMultas.ItemsSource = _multas
-            .Select(multa => new DetalheLinha(multa.Motivo, FormatoHelper.Moeda(multa.Valor)))
+            .Select(multa => new LinhaMulta(
+                Chave(multa),
+                multa.Motivo,
+                multa.Status == StatusMulta.Cancelada ? "Cancelada" : FormatoHelper.Moeda(multa.Valor),
+                multa.Status == StatusMulta.Cancelada,
+                UsuarioEhGerente))
             .ToList();
         TextoSemMultas.Visibility = _multas.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        TextoTotalMultas.Text = FormatoHelper.Moeda(total);
-        PainelPagamento.Visibility = total > 0 ? Visibility.Visible : Visibility.Collapsed;
-        SecaoPagamento.Valor = total;
+        TextoTotalMultas.Text = FormatoHelper.Moeda(_total);
+        PainelPagamento.Visibility = _total > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SecaoPagamento.Valor = _total;
     }
 
     /// <summary>Usa as regras dos models Devolucao e Vistoria para calcular as multas.</summary>
@@ -100,6 +124,22 @@ public partial class RegistrarDevolucaoView : UserControl
         return multas;
     }
 
+    /// <summary>Identifica o tipo da multa pelo início do motivo, como "Atraso" ou "Km excedente".</summary>
+    private static string Chave(Multa multa) => multa.Motivo.Split(" · ")[0];
+
+    /// <summary>Cancela ou restaura uma multa. Só aparece para o gerente.</summary>
+    private void ListaMultas_Click(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is not FrameworkElement { DataContext: LinhaMulta linha }) return;
+
+        if (!_multasCanceladas.Remove(linha.Chave))
+        {
+            _multasCanceladas.Add(linha.Chave);
+        }
+
+        Recalcular();
+    }
+
     private void ConcluirDevolucao_Click(object sender, RoutedEventArgs e)
     {
         var erro = Validar(out var dataDevolucao);
@@ -111,14 +151,14 @@ public partial class RegistrarDevolucaoView : UserControl
         }
 
         // TODO: trocar pelo controller: cria a Devolucao, a Vistoria, as Multas e o Pagamento,
-        // encerra o contrato e libera o veículo ou o envia para manutenção.
-        DadosDeExemplo.ConcluirDevolucao(_reserva.Id, dataDevolucao);
+        // aplica o desconto no Contrato, encerra o contrato e libera o veículo ou o envia para manutenção.
+        var enviarParaManutencao = CampoManutencao.IsChecked == true;
+        DadosDeExemplo.ConcluirDevolucao(_reserva.Id, dataDevolucao, enviarParaManutencao);
 
-        var total = _multas.Sum(multa => multa.Valor);
-        var mensagem = total > 0
-            ? $"Devolução registrada. Multas: {FormatoHelper.Moeda(total)}, pagas por {SecaoPagamento.Descricao}."
-            : "Devolução registrada sem multas.";
-        if (CampoManutencao.IsChecked == true)
+        var mensagem = _total > 0
+            ? $"Devolução registrada. Multas: {FormatoHelper.Moeda(_total)}, pagas por {SecaoPagamento.Descricao}."
+            : "Devolução registrada sem multas a pagar.";
+        if (enviarParaManutencao)
         {
             mensagem += "\nO veículo foi enviado para manutenção.";
         }
@@ -151,7 +191,13 @@ public partial class RegistrarDevolucaoView : UserControl
             return "Informe o valor da avaria.";
         }
 
-        return _multas.Count > 0 ? SecaoPagamento.Validar() : null;
+        var subtotal = _multas.Where(multa => multa.Status != StatusMulta.Cancelada).Sum(multa => multa.Valor);
+        if (_desconto > subtotal)
+        {
+            return "O desconto não pode ser maior que o total das multas.";
+        }
+
+        return _total > 0 ? SecaoPagamento.Validar() : null;
     }
 
     private void Voltar_Click(object sender, RoutedEventArgs e) =>
