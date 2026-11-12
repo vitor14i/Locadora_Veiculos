@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FrotaGO.Views.Gestao;
 
 namespace FrotaGO.Views.AreaFuncionario;
 
@@ -55,4 +56,13 @@ public partial class HomeFuncionarioView : UserControl
             Navegador.IrPara(new IniciarLocacaoView(visita.ReservaId));
         }
     }
+    private void Veiculos_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new VeiculosView());
+
+    private void Manutencoes_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new ManutencoesView());
+
+    private void Atendentes_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new AtendentesView());
+
+    private void Relatorios_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new RelatoriosView());
+
+    private void Clientes_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new ClientesView());
 }

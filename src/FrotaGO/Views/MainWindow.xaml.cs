@@ -23,10 +23,7 @@ public partial class MainWindow : Window
 
     private void Logo_Click(object sender, RoutedEventArgs e) => Navegador.IrParaHome();
 
-    private void Perfil_Click(object sender, RoutedEventArgs e)
-    {
-        // TODO (PR 4): abrir a PerfilView.
-    }
+    private void Perfil_Click(object sender, RoutedEventArgs e) => Navegador.IrPara(new PerfilView());
 
     private void Sair_Click(object sender, RoutedEventArgs e) => Navegador.Sair();
 }

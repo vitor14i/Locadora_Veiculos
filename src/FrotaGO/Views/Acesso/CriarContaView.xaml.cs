@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using FrotaGO.Views.AreaFuncionario;
+using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Acesso;
 
@@ -21,13 +11,32 @@ public partial class CriarContaView : UserControl
     private const int TamanhoMinimoSenha = 8;
     private const string FormatoData = "dd/MM/yyyy";
 
-    public CriarContaView()
+    /// <summary>Verdadeiro quando um funcionário cadastra um cliente atendido na loja.</summary>
+    private readonly bool _modoFuncionario;
+
+    public CriarContaView(bool modoFuncionario = false)
     {
         InitializeComponent();
+        _modoFuncionario = modoFuncionario;
+
+        if (modoFuncionario)
+        {
+            ConfigurarModoFuncionario();
+        }
+
         AtualizarCamposPorTipo();
     }
 
     private bool EhPessoaFisica => OpcaoPessoaFisica.IsChecked == true;
+
+    private void ConfigurarModoFuncionario()
+    {
+        TituloTela.Text = "Novo cliente";
+        SubtituloTela.Text = "Cadastre o cliente atendido na loja.";
+        RotuloSenha.Text = "Senha temporária";
+        BotaoCriar.Content = "Cadastrar cliente";
+        PainelEntrar.Visibility = Visibility.Collapsed;
+    }
 
     private void TipoPessoa_Checked(object sender, RoutedEventArgs e)
     {
@@ -57,9 +66,22 @@ public partial class CriarContaView : UserControl
             return;
         }
 
-        // TODO: chamar ContaController.CriarConta e, se der certo,
-        // voltar ao login com "Conta criada com sucesso. Entre para continuar."
-        MostrarErro("O cadastro ainda não está conectado ao sistema.");
+        // Pessoa jurídica aparece na lista pela razão social.
+        var nome = EhPessoaFisica ? CampoNome.Text.Trim() : CampoComplemento.Text.Trim();
+        var documento = $"{RotuloDocumento.Text} {CampoDocumento.Text.Trim()}";
+
+        // TODO: trocar pelo controller, que valida e salva o cliente com a senha em hash.
+        DadosDeExemplo.AdicionarCliente(nome, documento, CampoEmail.Text.Trim().ToLowerInvariant(),
+                                        CampoTelefone.Text.Trim());
+
+        if (_modoFuncionario)
+        {
+            Navegador.IrPara(new ClientesView("Cliente cadastrado com sucesso."));
+            return;
+        }
+
+        Navegador.IrPara(new LoginView("Conta criada com sucesso. Entre para continuar."),
+                         mostrarCabecalho: false);
     }
 
     /// <summary>Validações de preenchimento da tela. As regras de negócio também são validadas no controller.</summary>
@@ -74,8 +96,19 @@ public partial class CriarContaView : UserControl
             return "Preencha todos os campos.";
         }
 
+        var email = CampoEmail.Text.Trim().ToLowerInvariant();
+        if (!email.Contains('@'))
+        {
+            return "Informe um e-mail válido.";
+        }
+
+        if (DadosDeExemplo.Clientes.Any(cliente => cliente.Email == email))
+        {
+            return "Este e-mail já está cadastrado.";
+        }
+
         if (EhPessoaFisica && !DateTime.TryParseExact(
-                CampoNascimento.Text, FormatoData, CultureInfo.CurrentCulture,
+                CampoNascimento.Text, FormatoData, CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out _))
         {
             return "Informe a data de nascimento no formato dd/mm/aaaa.";

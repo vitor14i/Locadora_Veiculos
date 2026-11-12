@@ -18,6 +18,7 @@ using FrotaGO.Views.AreaCliente;
 using FrotaGO.Views.AreaFuncionario;
 
 namespace FrotaGO.Views.Acesso;
+using FrotaGO.Views.Exemplos;
 
 public partial class LoginView : UserControl
 {
@@ -43,7 +44,7 @@ public partial class LoginView : UserControl
         EntrarTemporariamente(CampoEmail.Text.Trim().ToLowerInvariant());
     }
 
-    /// <summary>Login provisório, sem verificar a senha, apenas para navegar entre as homes.</summary>
+    /// <summary>Login provisório, sem verificar a senha, apenas para navegar entre as telas.</summary>
     private static void EntrarTemporariamente(string email)
     {
         var nome = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(email.Split('@')[0]);
@@ -51,14 +52,18 @@ public partial class LoginView : UserControl
         switch (email)
         {
             case "gerente@frotago.com":
-                Navegador.Entrar(nome, () => new HomeFuncionarioView(nome, ehGerente: true));
+                Navegador.Entrar(new UsuarioSessao(nome, email, "Gerente"),
+                                 () => new HomeFuncionarioView(nome, ehGerente: true));
                 break;
             case "ana@frotago.com":
             case "bruno@frotago.com":
-                Navegador.Entrar(nome, () => new HomeFuncionarioView(nome, ehGerente: false));
+                Navegador.Entrar(new UsuarioSessao(nome, email, "Atendente"),
+                                 () => new HomeFuncionarioView(nome, ehGerente: false));
                 break;
             default:
-                Navegador.Entrar(nome, () => new HomeClienteView(nome));
+                var cliente = DadosDeExemplo.ClienteAtual;
+                Navegador.Entrar(new UsuarioSessao(cliente.Nome, email, "Cliente"),
+                                 () => new HomeClienteView(cliente.Nome));
                 break;
         }
     }

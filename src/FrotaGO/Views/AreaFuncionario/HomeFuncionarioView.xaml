@@ -9,24 +9,23 @@
             <!-- Gestão: só para o gerente -->
             <UniformGrid x:Name="LinhaGestao" Columns="4" Margin="-8,0,-8,16">
                 <Button Content="Veículos" Tag="Cadastre e atualize a frota"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="Veiculos_Click"/>
                 <Button Content="Manutenções" Tag="Controle os serviços"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="Manutencoes_Click"/>
                 <Button Content="Atendentes" Tag="Gerencie a equipe"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="Atendentes_Click"/>
                 <Button Content="Relatórios" Tag="Acompanhe os resultados"
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="Relatorios_Click"/>
             </UniformGrid>
 
             <!-- Atendimento -->
-            
             <UniformGrid Columns="3" Margin="-8,0">
-                <Button Content="Nova reserva" Tag="Reserve para clientes na loja" 
-                        Style="{StaticResource CardAtalho}" Margin="8,0" Click="NovaReserva_Click"/>
-                <Button Content="Registrar devolução" Tag="Encerre uma locação ativa" 
-                        Style="{StaticResource CardAtalho}" Margin="8,0" Click="RegistrarDevolucao_Click"/>
-                <Button Content="Clientes" Tag="Cadastre e atualize clientes" 
-                        Style="{StaticResource CardAtalho}" Margin="8,0"/>
+                <Button Content="Nova reserva" Tag="Reserve para clientes na loja"
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="NovaReserva_Click"/>
+                <Button Content="Registrar devolução" Tag="Encerre uma locação ativa"
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="RegistrarDevolucao_Click"/>
+                <Button Content="Clientes" Tag="Cadastre os clientes da loja"
+            Style="{StaticResource CardAtalho}" Margin="8,0" Click="Clientes_Click"/>
             </UniformGrid>
 
             <TextBlock Text="Visitas de hoje" Style="{StaticResource TextoSecao}"/>

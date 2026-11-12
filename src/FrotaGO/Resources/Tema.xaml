@@ -254,6 +254,21 @@
             <DataTrigger Binding="{Binding Status}" Value="Atrasada">
                 <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Disponível">
+                <Setter Property="Background" Value="{StaticResource CorSeloAtivaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Ativo">
+                <Setter Property="Background" Value="{StaticResource CorSeloAtivaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Alugado">
+                <Setter Property="Background" Value="{StaticResource CorSeloAgendadaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em andamento">
+                <Setter Property="Background" Value="{StaticResource CorSeloAgendadaFundo}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em manutenção">
+                <Setter Property="Background" Value="{StaticResource CorSeloCanceladaFundo}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="SeloTexto" TargetType="TextBlock">
@@ -276,6 +291,21 @@
                 <Setter Property="Foreground" Value="{StaticResource CorSeloAtivaTexto}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="Atrasada">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Disponível">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAtivaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Ativo">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAtivaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Alugado">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAgendadaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em andamento">
+                <Setter Property="Foreground" Value="{StaticResource CorSeloAgendadaTexto}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Em manutenção">
                 <Setter Property="Foreground" Value="{StaticResource CorSeloCanceladaTexto}"/>
             </DataTrigger>
         </Style.Triggers>
@@ -358,6 +388,64 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Converte true/false em visível/oculto -->
+    <BooleanToVisibilityConverter x:Key="BoolParaVisibilidade"/>
+
+    <!-- Tabelas -->
+    <Style x:Key="Tabela" TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="CanUserReorderColumns" Value="False"/>
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource CorBorda}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="RowBackground" Value="Transparent"/>
+        <Setter Property="AlternatingRowBackground" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{StaticResource CorTexto}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="RowHeight" Value="52"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Foreground" Value="{StaticResource CorTextoSecundario}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridColumnHeader">
+                    <Border Background="Transparent" Padding="0,0,8,10">
+                        <ContentPresenter VerticalAlignment="Bottom"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridCell">
+        <Setter Property="Foreground" Value="{StaticResource CorTexto}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border Background="Transparent" Padding="0,0,8,0">
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridRow">
+        <Setter Property="Background" Value="Transparent"/>
     </Style>
 
 </ResourceDictionary>

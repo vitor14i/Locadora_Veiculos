@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,32">
-            <TextBlock Text="Crie sua conta" Style="{StaticResource TextoTitulo}"
+            <TextBlock x:Name="TituloTela" Text="Crie sua conta" Style="{StaticResource TextoTitulo}" 
                        HorizontalAlignment="Center"/>
-            <TextBlock Text="Cadastre-se para reservar veículos e acompanhar suas locações."
+            <TextBlock x:Name="SubtituloTela" Text="Cadastre-se para reservar veículos e acompanhar suas locações." 
                        Style="{StaticResource TextoSubtitulo}"
                        HorizontalAlignment="Center" Margin="0,8,0,24"/>
 
@@ -71,7 +71,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="4" Grid.Column="0">
-                    <TextBlock Text="Senha" Style="{StaticResource TextoRotulo}"/>
+                    <TextBlock x:Name="RotuloSenha" Text="Senha" Style="{StaticResource TextoRotulo}"/>
                     <PasswordBox x:Name="CampoSenha"/>
                 </StackPanel>
                 <StackPanel Grid.Row="4" Grid.Column="2">
@@ -83,10 +83,10 @@
             <TextBlock x:Name="TextoMensagem" Style="{StaticResource TextoMensagem}"
                        Margin="0,12,0,0" Visibility="Collapsed"/>
 
-            <Button Content="Criar conta" Style="{StaticResource BotaoPrincipal}"
+            <Button x:Name="BotaoCriar" Content="Criar conta" Style="{StaticResource BotaoPrincipal}" 
                     Margin="0,24,0,0" Click="CriarConta_Click"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <StackPanel x:Name="PainelEntrar" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
                 <TextBlock Text="Já tem uma conta? " Style="{StaticResource TextoSubtitulo}"/>
                 <Button Content="Entrar" FontSize="15" Style="{StaticResource BotaoLink}"
                         Click="Entrar_Click"/>
