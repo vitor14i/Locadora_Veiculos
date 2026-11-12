@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaCliente.MinhasReservasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="1140" Margin="70,48,70,32">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="Minhas reservas" Style="{StaticResource TextoSaudacao}"/>
+                    <TextBlock Text="Acompanhe suas reservas e locações."
+                               Style="{StaticResource TextoSubtitulo}" Margin="0,8,0,0"/>
+                </StackPanel>
+                <Button Content="Reservar veículo" Style="{StaticResource BotaoPrincipal}"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="ReservarVeiculo_Click"/>
+            </Grid>
+
+            <TextBlock x:Name="TextoMensagem" FontSize="14" Foreground="{StaticResource CorSucesso}"
+                       Margin="0,16,0,0" Visibility="Collapsed"/>
+
+            <!-- Filtros -->
+            <Border Background="{StaticResource CorCampo}" CornerRadius="22" Padding="4"
+                    HorizontalAlignment="Left" Margin="0,24,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="Todas" GroupName="Filtro" IsChecked="True"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Filtro_Checked"/>
+                    <RadioButton Content="Agendadas" GroupName="Filtro"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Filtro_Checked"/>
+                    <RadioButton Content="Ativas" GroupName="Filtro"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Filtro_Checked"/>
+                    <RadioButton Content="Concluídas" GroupName="Filtro"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Filtro_Checked"/>
+                    <RadioButton Content="Canceladas" GroupName="Filtro"
+                                 Style="{StaticResource OpcaoSegmentada}" Checked="Filtro_Checked"/>
+                </StackPanel>
+            </Border>
+
+            <ItemsControl x:Name="ListaCards" Margin="-8,24,-8,0" ButtonBase.Click="ListaCards_Click">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="2"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <componentes:CardReservaView Margin="8"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock x:Name="TextoVazio" Style="{StaticResource TextoSubtitulo}"
+                       Margin="0,24,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

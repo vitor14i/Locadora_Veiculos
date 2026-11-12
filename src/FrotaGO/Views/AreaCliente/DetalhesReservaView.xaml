@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="FrotaGO.Views.AreaCliente.DetalhesReservaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:componentes="clr-namespace:FrotaGO.Views.Componentes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
+            <TextBlock Text="Detalhes da reserva" Style="{StaticResource TextoTitulo}"
+                       HorizontalAlignment="Center"/>
+
+            <StackPanel x:Name="PainelStatus" Orientation="Horizontal"
+                        HorizontalAlignment="Center" Margin="0,8,0,24">
+                <TextBlock x:Name="TextoNumero" Style="{StaticResource TextoSubtitulo}"
+                           VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <Border Style="{StaticResource SeloFundo}">
+                    <TextBlock Text="{Binding Status}" Style="{StaticResource SeloTexto}"/>
+                </Border>
+            </StackPanel>
+
+            <componentes:ResumoReservaView x:Name="Resumo"/>
+
+            <TextBlock x:Name="TextoAviso" Style="{StaticResource TextoSubtitulo}" TextWrapping="Wrap"
+                       Margin="0,16,0,0" Visibility="Collapsed"/>
+
+            <Grid Margin="0,24,0,0">
+                <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
+                        HorizontalAlignment="Left" Click="Voltar_Click"/>
+                <Button x:Name="BotaoCancelar" Content="Cancelar reserva" Style="{StaticResource BotaoSecundario}"
+                        HorizontalAlignment="Right" Visibility="Collapsed" Click="Cancelar_Click"/>
+                <Button x:Name="BotaoNovaReserva" Content="Nova reserva" Style="{StaticResource BotaoPrincipal}"
+                        HorizontalAlignment="Right" Visibility="Collapsed" Click="NovaReserva_Click"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

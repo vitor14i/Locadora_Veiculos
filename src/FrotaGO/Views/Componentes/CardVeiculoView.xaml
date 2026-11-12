@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="FrotaGO.Views.Componentes.CardVeiculoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Style="{StaticResource Card}" Height="200">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding Tipo}" FontSize="15"
+                       Foreground="{StaticResource CorTextoCardSecundario}"/>
+            <TextBlock Text="{Binding Categoria}" FontSize="15" HorizontalAlignment="Right"
+                       Foreground="{StaticResource CorTextoCardSecundario}"/>
+
+            <TextBlock Grid.Row="1" Text="{Binding Nome}" FontSize="26"
+                       Foreground="{StaticResource CorTextoCard}" TextTrimming="CharacterEllipsis"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <Grid Grid.Row="2">
+                <StackPanel>
+                    <TextBlock Text="{Binding DiariaTexto}" Style="{StaticResource TextoCardDetalhe}"/>
+                    <TextBlock Text="{Binding TotalTexto}" FontSize="15" FontWeight="Medium"
+                               Foreground="{StaticResource CorTextoCard}"/>
+                </StackPanel>
+                <Button Content="Reservar →" FontSize="14" Style="{StaticResource BotaoLink}"
+                        Foreground="{StaticResource CorTextoCard}"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
