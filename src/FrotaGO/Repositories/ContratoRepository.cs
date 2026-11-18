@@ -14,7 +14,7 @@ public class ContratoRepository : IContratoRepository
 
     /// <summary>
     /// Contrato com o cliente, os veículos e os pagamentos.
-    /// Rastreado, porque a POO-19 vai usá-lo para registrar a devolução.
+    /// Rastreado, porque é usado para registrar a devolução.
     /// </summary>
     public Contrato? ObterPorId(int id) =>
         _contexto.Contratos

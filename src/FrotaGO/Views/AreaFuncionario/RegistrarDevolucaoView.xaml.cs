@@ -10,11 +10,7 @@ namespace FrotaGO.Views.AreaFuncionario;
 
 public partial class RegistrarDevolucaoView : UserControl
 {
-    // TODO: confirmar estas regras com o grupo e registrá-las no documento de regras de negócio.
-    private const decimal LimiteKmPorDiaria = 200m;
-    private const decimal ValorPorKmExcedente = 1.00m;
-
-    private readonly LocacaoController _locacaoController;
+    private readonly DevolucaoController _devolucaoController;
 
     /// <summary>Contrato com a reserva, o cliente e os itens. Fica nulo se não for encontrado.</summary>
     private readonly Contrato? _contrato;
@@ -22,20 +18,18 @@ public partial class RegistrarDevolucaoView : UserControl
     /// <summary>Tipos de multa cancelados pelo gerente, como "Atraso" ou "Avaria".</summary>
     private readonly HashSet<string> _multasCanceladas = [];
 
-    private List<Multa> _multas = [];
-    private decimal _desconto;
+    /// <summary>Total a pagar na prévia. Define se o pagamento aparece.</summary>
     private decimal _total;
 
     public RegistrarDevolucaoView(int contratoId)
     {
         InitializeComponent();
-        _locacaoController = FabricaDeControllers.CriarLocacaoController();
+        _devolucaoController = FabricaDeControllers.CriarDevolucaoController();
 
-        _contrato = _locacaoController.ObterContrato(contratoId);
+        _contrato = _devolucaoController.ObterContrato(contratoId);
         if (_contrato is null)
         {
-            TextoMensagem.Text = "Locação não encontrada.";
-            TextoMensagem.Visibility = Visibility.Visible;
+            MostrarErro("Locação não encontrada.");
             return;
         }
 
@@ -47,6 +41,9 @@ public partial class RegistrarDevolucaoView : UserControl
                                       new("Contrato", $"nº {_contrato.Id}"),
                                       new("Km de saída", $"{Item.KmInicial:N0}")]);
         Resumo.DataContext = resumo;
+
+        // Só o gerente registra manutenções.
+        CampoManutencao.Visibility = UsuarioEhGerente ? Visibility.Visible : Visibility.Collapsed;
 
         CampoDataDevolucao.Text = FormatoHelper.DataHoraCampo(DateTime.Now);
         Recalcular();
@@ -64,7 +61,7 @@ public partial class RegistrarDevolucaoView : UserControl
 
     private void Avaria_Alterada(object sender, RoutedEventArgs e) => Recalcular();
 
-    /// <summary>Recalcula as multas e mostra o pagamento apenas quando há valor a cobrar.</summary>
+    /// <summary>Mostra a prévia das multas, calculada pelo controller, e o pagamento apenas quando há valor a cobrar.</summary>
     private void Recalcular()
     {
         // Os eventos também disparam durante o InitializeComponent.
@@ -74,78 +71,48 @@ public partial class RegistrarDevolucaoView : UserControl
         PainelAvaria.Visibility = CampoAvaria.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PainelDesconto.Visibility = UsuarioEhGerente ? Visibility.Visible : Visibility.Collapsed;
 
-        _multas = CalcularMultas();
-        foreach (var multa in _multas.Where(multa => _multasCanceladas.Contains(Chave(multa))))
+        // Campo vazio ou inválido vira null, e o controller não gera a multa correspondente.
+        var multas = _devolucaoController.CalcularMultas(_contrato, LerDataDevolucao(), LerKmChegada(),
+                                                         LerValorAvaria());
+        foreach (var multa in multas.Where(multa => _multasCanceladas.Contains(DevolucaoController.TipoDe(multa))))
         {
             multa.Cancelar();
         }
 
-        var subtotal = _multas.Where(multa => multa.Status != StatusMulta.Cancelada).Sum(multa => multa.Valor);
-        _desconto = UsuarioEhGerente && FormatoHelper.TentarLerValor(CampoDesconto.Text, out var desconto)
-            ? desconto
-            : 0;
-        _total = Math.Max(0, subtotal - _desconto);
+        // A prévia segue a mesma conta do controller, que refaz tudo ao registrar.
+        var subtotal = multas.Where(multa => multa.Status != StatusMulta.Cancelada).Sum(multa => multa.Valor);
+        _total = Math.Max(0, subtotal - LerDesconto());
 
-        ListaMultas.ItemsSource = _multas
+        ListaMultas.ItemsSource = multas
             .Select(multa => new LinhaMulta(
-                Chave(multa),
+                DevolucaoController.TipoDe(multa),
                 multa.Motivo,
                 multa.Status == StatusMulta.Cancelada ? "Cancelada" : FormatoHelper.Moeda(multa.Valor),
                 multa.Status == StatusMulta.Cancelada,
                 UsuarioEhGerente))
             .ToList();
-        TextoSemMultas.Visibility = _multas.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        TextoSemMultas.Visibility = multas.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         TextoTotalMultas.Text = FormatoHelper.Moeda(_total);
         PainelPagamento.Visibility = _total > 0 ? Visibility.Visible : Visibility.Collapsed;
         SecaoPagamento.Valor = _total;
     }
 
-    /// <summary>
-    /// Usa as regras dos models Devolucao e Vistoria para calcular as multas.
-    /// A diária, as diárias e o km de saída vêm do item do contrato.
-    /// </summary>
-    private List<Multa> CalcularMultas()
-    {
-        var multas = new List<Multa>();
+    // Leitura dos campos para a prévia. Campo vazio ou inválido vira null (ou zero, no desconto).
+    private DateTime? LerDataDevolucao() =>
+        FormatoHelper.TentarLerDataHora(CampoDataDevolucao.Text, out var data) ? data : null;
 
-        if (FormatoHelper.TentarLerDataHora(CampoDataDevolucao.Text, out var dataDevolucao))
-        {
-            var diasAtraso = new Devolucao { DataDevolucao = dataDevolucao }.CalcularDiasAtraso(Reserva.DataFim);
-            if (diasAtraso > 0)
-            {
-                multas.Add(new Multa
-                {
-                    Motivo = $"Atraso · {FormatoHelper.Quantidade(diasAtraso, "dia", "dias")}",
-                    Valor = diasAtraso * Item.ValorDiaria
-                });
-            }
-        }
+    private decimal? LerKmChegada() =>
+        FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var km) ? km : null;
 
-        if (FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var kmChegada))
-        {
-            var kmRodados = new Vistoria { KmFinal = kmChegada }.CalcularKmRodados(Item.KmInicial);
-            var kmExcedente = kmRodados - LimiteKmPorDiaria * Item.QuantidadeDias;
-            if (kmExcedente > 0)
-            {
-                multas.Add(new Multa
-                {
-                    Motivo = $"Km excedente · {kmExcedente:N0} km",
-                    Valor = kmExcedente * ValorPorKmExcedente
-                });
-            }
-        }
+    /// <summary>Sem a avaria marcada, não há valor de avaria.</summary>
+    private decimal? LerValorAvaria() =>
+        CampoAvaria.IsChecked == true && FormatoHelper.TentarLerValor(CampoValorAvaria.Text, out var valor)
+            ? valor
+            : null;
 
-        if (CampoAvaria.IsChecked == true &&
-            FormatoHelper.TentarLerValor(CampoValorAvaria.Text, out var valorAvaria) && valorAvaria > 0)
-        {
-            multas.Add(new Multa { Motivo = "Avaria", Valor = valorAvaria });
-        }
-
-        return multas;
-    }
-
-    /// <summary>Identifica o tipo da multa pelo início do motivo, como "Atraso" ou "Km excedente".</summary>
-    private static string Chave(Multa multa) => multa.Motivo.Split(" · ")[0];
+    /// <summary>Só o gerente vê o campo de desconto.</summary>
+    private decimal LerDesconto() =>
+        UsuarioEhGerente && FormatoHelper.TentarLerValor(CampoDesconto.Text, out var desconto) ? desconto : 0;
 
     /// <summary>Cancela ou restaura uma multa. Só aparece para o gerente.</summary>
     private void ListaMultas_Click(object sender, RoutedEventArgs e)
@@ -160,57 +127,81 @@ public partial class RegistrarDevolucaoView : UserControl
         Recalcular();
     }
 
-    /// <summary>O botão fica desabilitado no .xaml até a POO-19.</summary>
     private void ConcluirDevolucao_Click(object sender, RoutedEventArgs e)
     {
         if (_contrato is null) return;
 
-        var erro = Validar(out _);
+        var erro = Validar(out var dataDevolucao, out var kmChegada);
         if (erro is not null)
         {
-            TextoMensagem.Text = erro;
-            TextoMensagem.Visibility = Visibility.Visible;
+            MostrarErro(erro);
             return;
         }
 
-        // TODO (POO-19): trocar pelo controller: cria a Devolucao, a Vistoria, as Multas e o Pagamento,
-        // aplica o desconto no Contrato, encerra o contrato e libera o veículo ou o envia para manutenção.
-        MessageBox.Show("O registro da devolução ainda não está disponível.", "Registrar devolução",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+        // As regras de negócio, inclusive as do gerente, ficam no controller.
+        var dados = new DadosDevolucao(
+            _contrato.Id,
+            dataDevolucao,
+            kmChegada,
+            CampoObservacoes.Text,
+            CampoAvaria.IsChecked == true,
+            LerValorAvaria() ?? 0,
+            _multasCanceladas.ToList(),
+            LerDesconto(),
+            CampoManutencao.IsChecked == true,
+            _total > 0 ? SecaoPagamento.CriarPagamento() : null);
+
+        var resultado = _devolucaoController.Registrar(dados, Navegador.Usuario?.Id ?? 0);
+        if (!resultado.Sucesso)
+        {
+            MostrarErro(resultado.Erro);
+            return;
+        }
+
+        var destino = dados.EnviarParaManutencao
+            ? "O veículo foi enviado para manutenção."
+            : "O veículo está disponível.";
+        MessageBox.Show($"Devolução registrada. Contrato nº {_contrato.Id} encerrado. {destino}",
+                        "Registrar devolução", MessageBoxButton.OK, MessageBoxImage.Information);
+        Navegador.IrPara(new LocacoesAtivasView());
     }
 
-    private string? Validar(out DateTime dataDevolucao)
+    /// <summary>
+    /// Só o preenchimento: o formato da data, da quilometragem, da avaria e do desconto,
+    /// e os dados do pagamento. As regras de negócio ficam no controller.
+    /// </summary>
+    private string? Validar(out DateTime dataDevolucao, out decimal kmChegada)
     {
+        kmChegada = 0;
+
         if (!FormatoHelper.TentarLerDataHora(CampoDataDevolucao.Text, out dataDevolucao))
         {
             return "Informe a data da devolução no formato dd/mm/aaaa hh:mm.";
         }
 
-        // A locação pode ter começado antes do horário da reserva, então vale o início do contrato.
-        if (dataDevolucao < _contrato!.DataGeracao)
+        if (!FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out kmChegada))
         {
-            return "A devolução não pode ser antes do início da locação.";
+            return "Informe a quilometragem de chegada.";
         }
 
-        if (!FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var kmChegada) ||
-            kmChegada < Item.KmInicial)
-        {
-            return "Informe uma quilometragem de chegada maior ou igual à de saída.";
-        }
-
-        if (CampoAvaria.IsChecked == true &&
-            (!FormatoHelper.TentarLerValor(CampoValorAvaria.Text, out var valorAvaria) || valorAvaria <= 0))
+        if (CampoAvaria.IsChecked == true && LerValorAvaria() is null)
         {
             return "Informe o valor da avaria.";
         }
 
-        var subtotal = _multas.Where(multa => multa.Status != StatusMulta.Cancelada).Sum(multa => multa.Valor);
-        if (_desconto > subtotal)
+        if (UsuarioEhGerente && !string.IsNullOrWhiteSpace(CampoDesconto.Text) &&
+            !FormatoHelper.TentarLerValor(CampoDesconto.Text, out _))
         {
-            return "O desconto não pode ser maior que o total das multas.";
+            return "Informe um valor de desconto válido.";
         }
 
         return _total > 0 ? SecaoPagamento.Validar() : null;
+    }
+
+    private void MostrarErro(string texto)
+    {
+        TextoMensagem.Text = texto;
+        TextoMensagem.Visibility = Visibility.Visible;
     }
 
     private void Voltar_Click(object sender, RoutedEventArgs e) =>

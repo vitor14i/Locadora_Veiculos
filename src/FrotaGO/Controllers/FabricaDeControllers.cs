@@ -49,4 +49,16 @@ public static class FabricaDeControllers
             new ContratoRepository(contexto),
             new UnidadeDeTrabalho(contexto));
     }
+
+    /// <summary>Os cinco objetos usam o mesmo contexto, então um único Salvar() grava tudo.</summary>
+    public static DevolucaoController CriarDevolucaoController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new DevolucaoController(
+            new ContratoRepository(contexto),
+            new DevolucaoRepository(contexto),
+            new ManutencaoRepository(contexto),
+            new UsuarioRepository(contexto),
+            new UnidadeDeTrabalho(contexto));
+    }
 }

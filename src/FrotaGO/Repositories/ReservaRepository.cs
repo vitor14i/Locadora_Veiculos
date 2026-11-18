@@ -21,8 +21,8 @@ public class ReservaRepository : IReservaRepository
             .FirstOrDefault(reserva => reserva.Id == id);
 
     /// <summary>
-    /// Reservas do cliente, das mais recentes para as mais antigas, com o contrato e a devolução
-    /// para os cards de locação. Apenas para leitura.
+    /// Reservas do cliente, das mais recentes para as mais antigas, com o contrato, a devolução e
+    /// os pagamentos para os cards de locação. Apenas para leitura.
     /// </summary>
     public List<Reserva> ListarPorCliente(int clienteId) =>
         _contexto.Reservas
@@ -30,6 +30,9 @@ public class ReservaRepository : IReservaRepository
             .Include(reserva => reserva.Veiculo)
             .Include(reserva => reserva.Contrato)
                 .ThenInclude(contrato => contrato!.Devolucao)
+            // O "Valor final" do card Concluída soma os pagamentos.
+            .Include(reserva => reserva.Contrato)
+                .ThenInclude(contrato => contrato!.Pagamentos)
             .Where(reserva => reserva.ClienteId == clienteId)
             .OrderByDescending(reserva => reserva.DataInicio)
             .ToList();
