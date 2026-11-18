@@ -40,8 +40,6 @@ public static class FabricaDeControllers
             new UnidadeDeTrabalho(contexto));
     }
 
-    // ---------- Novo na POO-18 ----------
-
     /// <summary>Os três objetos usam o mesmo contexto, então um único Salvar() grava tudo.</summary>
     public static LocacaoController CriarLocacaoController()
     {

@@ -14,12 +14,10 @@ public partial class RegistrarDevolucaoView : UserControl
     private const decimal LimiteKmPorDiaria = 200m;
     private const decimal ValorPorKmExcedente = 1.00m;
 
-    // ---------- Alterado na POO-18 ----------
     private readonly LocacaoController _locacaoController;
 
     /// <summary>Contrato com a reserva, o cliente e os itens. Fica nulo se não for encontrado.</summary>
     private readonly Contrato? _contrato;
-    // ---------- Fim do trecho alterado ----------
 
     /// <summary>Tipos de multa cancelados pelo gerente, como "Atraso" ou "Avaria".</summary>
     private readonly HashSet<string> _multasCanceladas = [];
@@ -27,8 +25,6 @@ public partial class RegistrarDevolucaoView : UserControl
     private List<Multa> _multas = [];
     private decimal _desconto;
     private decimal _total;
-
-    // ---------- Alterado na POO-18 ----------
 
     public RegistrarDevolucaoView(int contratoId)
     {
@@ -62,8 +58,6 @@ public partial class RegistrarDevolucaoView : UserControl
     /// <summary>A reserva tem um único veículo, então o contrato tem um único item.</summary>
     private ItemContrato Item => _contrato!.Itens.First();
 
-    // ---------- Fim do trecho alterado ----------
-
     private static bool UsuarioEhGerente => Navegador.Usuario?.EhGerente == true;
 
     private void Campo_TextChanged(object sender, TextChangedEventArgs e) => Recalcular();
@@ -74,7 +68,7 @@ public partial class RegistrarDevolucaoView : UserControl
     private void Recalcular()
     {
         // Os eventos também disparam durante o InitializeComponent.
-        // Alterado na POO-18: sem contrato, não há o que calcular.
+        // Sem contrato, não há o que calcular.
         if (!IsInitialized || _contrato is null) return;
 
         PainelAvaria.Visibility = CampoAvaria.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
@@ -108,7 +102,7 @@ public partial class RegistrarDevolucaoView : UserControl
 
     /// <summary>
     /// Usa as regras dos models Devolucao e Vistoria para calcular as multas.
-    /// Alterado na POO-18: a diária, as diárias e o km de saída vêm do item do contrato.
+    /// A diária, as diárias e o km de saída vêm do item do contrato.
     /// </summary>
     private List<Multa> CalcularMultas()
     {
@@ -166,8 +160,6 @@ public partial class RegistrarDevolucaoView : UserControl
         Recalcular();
     }
 
-    // ---------- Alterado na POO-18 ----------
-
     /// <summary>O botão fica desabilitado no .xaml até a POO-19.</summary>
     private void ConcluirDevolucao_Click(object sender, RoutedEventArgs e)
     {
@@ -205,8 +197,6 @@ public partial class RegistrarDevolucaoView : UserControl
         {
             return "Informe uma quilometragem de chegada maior ou igual à de saída.";
         }
-
-        // ---------- Fim do trecho alterado ----------
 
         if (CampoAvaria.IsChecked == true &&
             (!FormatoHelper.TentarLerValor(CampoValorAvaria.Text, out var valorAvaria) || valorAvaria <= 0))

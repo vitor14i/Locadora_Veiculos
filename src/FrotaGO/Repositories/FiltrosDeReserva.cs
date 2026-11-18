@@ -25,6 +25,6 @@ public static class FiltrosDeReserva
              fim > reserva.DataInicio) ||
             (reserva.Status == StatusReserva.Convertida &&
              reserva.Contrato!.Status == StatusContrato.Ativo &&
-             fim > reserva.Contrato!.DataGeracao); // Alterado na POO-18: era fim > reserva.DataInicio
+             fim > reserva.Contrato!.DataGeracao);
     }
 }

@@ -2,7 +2,7 @@
 
 public class LocacaoItem
 {
-    public int ContratoId { get; init; } // Alterado na POO-18: era ReservaId
+    public int ContratoId { get; init; }
     public string Contrato { get; init; } = string.Empty;
     public string Cliente { get; init; } = string.Empty;
     public string Veiculo { get; init; } = string.Empty;

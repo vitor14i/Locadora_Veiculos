@@ -14,7 +14,7 @@ public static class MapeadorDeTela
     public const string StatusCancelada = "Cancelada";
     public const string StatusExpirada = "Expirada";
 
-    // Novo na POO-18: situação de uma locação ativa.
+    // Situação de uma locação ativa.
     public const string SituacaoEmDia = "Em dia";
     public const string SituacaoAtrasada = "Atrasada";
 
@@ -32,8 +32,6 @@ public static class MapeadorDeTela
         Nome = NomeVeiculo(veiculo),
         Diaria = veiculo.Calcular(1)
     };
-
-    // ---------- Novo na POO-18 ----------
 
     /// <summary>
     /// Item do veículo com a diária e as diárias gravadas no contrato, e não as atuais do veículo.
@@ -57,8 +55,6 @@ public static class MapeadorDeTela
             Status = reserva.DataFim < DateTime.Now ? SituacaoAtrasada : SituacaoEmDia
         };
     }
-
-    // ---------- Fim do trecho novo ----------
 
     /// <summary>Mesma regra da ClientesView: pessoa jurídica aparece pela razão social.</summary>
     public static ClienteItem CriarClienteItem(Cliente cliente) => new(

@@ -7,14 +7,14 @@ namespace FrotaGO.Views.AreaFuncionario;
 
 public partial class LocacoesAtivasView : UserControl
 {
-    private readonly LocacaoController _locacaoController; // Novo na POO-18
+    private readonly LocacaoController _locacaoController;
 
     public LocacoesAtivasView()
     {
         InitializeComponent();
         _locacaoController = FabricaDeControllers.CriarLocacaoController();
 
-        // Alterado na POO-18: os contratos ativos vêm do banco, e a situação é calculada no MapeadorDeTela.
+        // Os contratos ativos vêm do banco, e a situação é calculada no MapeadorDeTela.
         var locacoes = _locacaoController.ListarAtivos().Select(MapeadorDeTela.CriarLocacao).ToList();
         ListaLocacoes.ItemsSource = locacoes;
         TextoVazio.Visibility = locacoes.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -24,7 +24,7 @@ public partial class LocacoesAtivasView : UserControl
     {
         if (e.OriginalSource is FrameworkElement { DataContext: LocacaoItem locacao })
         {
-            // Alterado na POO-18: a devolução abre pelo número do contrato.
+            // A devolução abre pelo número do contrato.
             Navegador.IrPara(new RegistrarDevolucaoView(locacao.ContratoId));
         }
     }

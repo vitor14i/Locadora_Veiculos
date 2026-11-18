@@ -10,14 +10,14 @@ namespace FrotaGO.Views.AreaFuncionario;
 public partial class IniciarLocacaoView : UserControl
 {
     private readonly ReservaController _reservaController;
-    private readonly LocacaoController _locacaoController; // Novo na POO-18
+    private readonly LocacaoController _locacaoController;
     private readonly Reserva? _reserva;
 
     public IniciarLocacaoView(int reservaId)
     {
         InitializeComponent();
         _reservaController = FabricaDeControllers.CriarReservaController();
-        _locacaoController = FabricaDeControllers.CriarLocacaoController(); // Novo na POO-18
+        _locacaoController = FabricaDeControllers.CriarLocacaoController();
 
         // A reserva vem do controller, com cliente, veículo e contrato.
         _reserva = _reservaController.Obter(reservaId);
@@ -36,8 +36,6 @@ public partial class IniciarLocacaoView : UserControl
         Resumo.DataContext = resumo;
         SecaoPagamento.Valor = veiculo.Total;
     }
-
-    // ---------- Alterado na POO-18 ----------
 
     private void IniciarLocacao_Click(object sender, RoutedEventArgs e)
     {
@@ -78,8 +76,6 @@ public partial class IniciarLocacaoView : UserControl
 
         return SecaoPagamento.Validar();
     }
-
-    // ---------- Fim do trecho alterado ----------
 
     private void MostrarErro(string texto)
     {

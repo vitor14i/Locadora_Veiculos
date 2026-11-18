@@ -12,7 +12,7 @@ public class ReservaRepository : IReservaRepository
 
     public ReservaRepository(FrotaGODbContext contexto) => _contexto = contexto;
 
-    /// <summary>Rastreado, porque é usado para cancelar e, na POO-18, para iniciar a locação.</summary>
+    /// <summary>Rastreado, porque é usado para cancelar e para iniciar a locação.</summary>
     public Reserva? ObterPorId(int id) =>
         _contexto.Reservas
             .Include(reserva => reserva.Veiculo)
