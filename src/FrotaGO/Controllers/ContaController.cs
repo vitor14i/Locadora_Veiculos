@@ -4,10 +4,9 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Login, cadastro e consulta de clientes.</summary>
+/// <summary>Login, cadastro e consulta de clientes, e perfil de todos os usuários.</summary>
 public class ContaController
 {
-    private const int TamanhoMinimoSenha = 8;
     private const string MensagemLoginInvalido = "E-mail ou senha incorretos.";
 
     private readonly IUsuarioRepository _usuarios;
@@ -61,6 +60,71 @@ public class ContaController
 
     public List<Cliente> ListarClientesAtivos() => _usuarios.ListarClientesAtivos();
 
+    /// <summary>Usuário rastreado, com os dados completos para a tela de perfil.</summary>
+    public Usuario? ObterUsuario(int usuarioId) => _usuarios.ObterPorId(usuarioId);
+
+    /// <summary>Altera nome e e-mail de qualquer usuário. O telefone só vale para o cliente.</summary>
+    public Resultado AtualizarDados(int usuarioId, string nome, string email, string? telefone)
+    {
+        var usuario = _usuarios.ObterPorId(usuarioId);
+        if (usuario is null)
+        {
+            return Resultado.Falha("Usuário não encontrado.");
+        }
+
+        var emailNormalizado = NormalizarEmail(email);
+        var erro = ValidarDados(usuario, nome, emailNormalizado, telefone);
+        if (erro is not null)
+        {
+            return Resultado.Falha(erro);
+        }
+
+        // Só depois de todas as regras: se alguma falhar, o objeto rastreado não muda.
+        usuario.AlterarDados(nome.Trim(), emailNormalizado);
+        if (usuario is Cliente cliente)
+        {
+            // ValidarDados já garantiu que o telefone do cliente foi informado.
+            cliente.Telefone = telefone!.Trim();
+        }
+
+        _unidadeDeTrabalho.Salvar();
+        return Resultado.Ok();
+    }
+
+    public Resultado AlterarSenha(int usuarioId, string senhaAtual, string novaSenha)
+    {
+        if (string.IsNullOrEmpty(senhaAtual) || string.IsNullOrEmpty(novaSenha))
+        {
+            return Resultado.Falha("Preencha a senha atual e a nova senha.");
+        }
+
+        var usuario = _usuarios.ObterPorId(usuarioId);
+        if (usuario is null)
+        {
+            return Resultado.Falha("Usuário não encontrado.");
+        }
+
+        if (!usuario.ValidarSenha(senhaAtual))
+        {
+            return Resultado.Falha("A senha atual está incorreta.");
+        }
+
+        if (novaSenha.Length < Usuario.TamanhoMinimoSenha)
+        {
+            return Resultado.Falha($"A nova senha deve ter pelo menos {Usuario.TamanhoMinimoSenha} caracteres.");
+        }
+
+        if (novaSenha == senhaAtual)
+        {
+            return Resultado.Falha("A nova senha deve ser diferente da atual.");
+        }
+
+        // Só depois de todas as regras. O model guarda o hash, nunca o texto da senha.
+        usuario.DefinirSenha(novaSenha);
+        _unidadeDeTrabalho.Salvar();
+        return Resultado.Ok();
+    }
+
     private string? ValidarCliente(DadosCliente dados, string email, string documento)
     {
         string[] obrigatorios = [dados.Nome, dados.Documento, dados.CnhOuRazaoSocial,
@@ -76,9 +140,9 @@ public class ContaController
             return "Informe um e-mail válido.";
         }
 
-        if (dados.Senha.Length < TamanhoMinimoSenha)
+        if (dados.Senha.Length < Usuario.TamanhoMinimoSenha)
         {
-            return $"A senha deve ter pelo menos {TamanhoMinimoSenha} caracteres.";
+            return $"A senha deve ter pelo menos {Usuario.TamanhoMinimoSenha} caracteres.";
         }
 
         if (_usuarios.EmailExiste(email))
@@ -114,6 +178,29 @@ public class ContaController
         return _usuarios.CnpjExiste(documento) ? "Este CNPJ já está cadastrado." : null;
     }
 
+    /// <summary>O e-mail é único entre todos os usuários, sem contar o próprio usuário.</summary>
+    private string? ValidarDados(Usuario usuario, string nome, string email, string? telefone)
+    {
+        if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(email))
+        {
+            return "Informe o nome e o e-mail.";
+        }
+
+        if (usuario is Cliente && string.IsNullOrWhiteSpace(telefone))
+        {
+            return "Informe o telefone.";
+        }
+
+        if (!email.Contains('@'))
+        {
+            return "Informe um e-mail válido.";
+        }
+
+        return _usuarios.EmailExiste(email, ignorarUsuarioId: usuario.Id)
+            ? "Este e-mail já está cadastrado."
+            : null;
+    }
+
     private static Cliente CriarCliente(DadosCliente dados, string email, string documento)
     {
         Cliente cliente = dados.EhPessoaFisica
@@ -133,7 +220,7 @@ public class ContaController
         cliente.Email = email;
         cliente.Telefone = dados.Telefone.Trim();
         cliente.Endereco = dados.Endereco.Trim();
-        cliente.SenhaHash = PasswordHasher.Hash(dados.Senha);
+        cliente.DefinirSenha(dados.Senha);
         return cliente;
     }
 
