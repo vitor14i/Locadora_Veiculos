@@ -61,4 +61,11 @@ public static class FabricaDeControllers
             new UsuarioRepository(contexto),
             new UnidadeDeTrabalho(contexto));
     }
+
+    /// <summary>Só leitura: o relatório não grava nada, então não usa a unidade de trabalho.</summary>
+    public static RelatorioController CriarRelatorioController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new RelatorioController(new RelatorioRepository(contexto));
+    }
 }

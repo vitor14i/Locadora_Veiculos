@@ -74,7 +74,8 @@
                 <DataGridTextColumn Header="Posição" Binding="{Binding Posicao}" Width="*"/>
                 <DataGridTextColumn Header="Veículo" Binding="{Binding Veiculo}" Width="3*"/>
                 <DataGridTextColumn Header="Locações" Binding="{Binding Locacoes}" Width="*"/>
-                <DataGridTextColumn Header="Faturamento" Binding="{Binding Faturamento}" Width="1.5*"/>
+                <!-- A coluna soma só as diárias, sem as multas. -->
+                <DataGridTextColumn Header="Receita das diárias" Binding="{Binding Faturamento}" Width="1.5*"/>
             </DataGrid.Columns>
         </DataGrid>
         <TextBlock x:Name="TextoVazio" Grid.Row="5" Text="Nenhuma locação nesse período."
