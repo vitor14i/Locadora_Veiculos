@@ -45,7 +45,14 @@ public class Contrato
 
     public void AplicarDesconto(decimal valor) => Desconto = valor;
 
-    public decimal CalcularSaldoDevedor() => ValorTotal - Desconto - Pagamentos.Sum(p => p.Valor);
+    public decimal CalcularSaldoDevedor()
+    {
+        var multas = Devolucao?.Multas
+            .Where(multa => multa.Status != StatusMulta.Cancelada)
+            .Sum(multa => multa.Valor) ?? 0;
+
+        return ValorTotal + multas - Desconto - Pagamentos.Sum(pagamento => pagamento.Valor);
+    }
 
     public void Encerrar() => Status = StatusContrato.Encerrado;
 }
