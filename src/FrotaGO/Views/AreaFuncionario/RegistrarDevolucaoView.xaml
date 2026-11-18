@@ -94,8 +94,9 @@
             <Grid Margin="0,24,0,0">
                 <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
                         HorizontalAlignment="Left" Click="Voltar_Click"/>
+                <!-- POO-18: desabilitado até a POO-19, que registra a devolução no banco. -->
                 <Button Content="Concluir devolução" Style="{StaticResource BotaoPrincipal}"
-                        HorizontalAlignment="Right" Click="ConcluirDevolucao_Click"/>
+                        HorizontalAlignment="Right" IsEnabled="False" Click="ConcluirDevolucao_Click"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

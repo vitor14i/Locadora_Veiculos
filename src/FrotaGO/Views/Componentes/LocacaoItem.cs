@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FrotaGO.Views.Componentes;
 
-namespace FrotaGO.Views.Componentes;
 public class LocacaoItem
 {
-    public int ReservaId { get; init; }
+    public int ContratoId { get; init; } // Alterado na POO-18: era ReservaId
     public string Contrato { get; init; } = string.Empty;
     public string Cliente { get; init; } = string.Empty;
     public string Veiculo { get; init; } = string.Empty;
