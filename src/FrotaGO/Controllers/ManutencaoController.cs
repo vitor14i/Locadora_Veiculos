@@ -4,7 +4,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Início e fim das manutenções da frota, registrados pelo gerente.</summary>
 public class ManutencaoController
 {
     private const string MensagemSomenteGerente = "Somente um gerente ativo pode registrar manutenções.";

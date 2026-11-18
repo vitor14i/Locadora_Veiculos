@@ -3,7 +3,6 @@ using FrotaGO.Repositories;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Monta cada controller com o contexto, os repositórios e a unidade de trabalho.</summary>
 public static class FabricaDeControllers
 {
     public static ContaController CriarContaController()

@@ -40,7 +40,6 @@ public class ReservaRepository : IReservaRepository
             .OrderByDescending(reserva => reserva.DataInicio)
             .ToList();
 
-    /// <summary>Reservas agendadas com retirada no dia, em ordem de horário. Apenas para leitura.</summary>
     public List<Reserva> ListarVisitasDoDia(DateTime data)
     {
         var inicioDoDia = data.Date;

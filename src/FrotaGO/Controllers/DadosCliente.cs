@@ -1,6 +1,5 @@
 namespace FrotaGO.Controllers;
 
-/// <summary>Campos do formulário de cadastro de cliente, como foram digitados na tela.</summary>
 public record DadosCliente(
     bool EhPessoaFisica,
     string Nome,

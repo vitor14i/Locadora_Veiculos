@@ -4,7 +4,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Início da locação (contrato, item e pagamento), lista das locações ativas e busca de um contrato.</summary>
 public class LocacaoController
 {
     private readonly IReservaRepository _reservas;
@@ -19,16 +18,11 @@ public class LocacaoController
         _unidadeDeTrabalho = unidadeDeTrabalho;
     }
 
-    /// <summary>
-    /// Converte a reserva em locação: cria o contrato com o item e o pagamento, muda a reserva
-    /// para Convertida e o veículo para Alugado, e grava tudo com um único Salvar().
-    /// </summary>
     public Resultado<Contrato> IniciarLocacao(int reservaId, decimal kmSaida, bool documentosConferidos,
                                               Pagamento pagamento)
     {
         var agora = DateTime.Now;
 
-        // A reserva vem rastreada, com o veículo, o cliente e o contrato.
         var reserva = _reservas.ObterPorId(reservaId);
         if (reserva is null)
         {

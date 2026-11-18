@@ -3,7 +3,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Lista, cadastro e edição dos veículos da frota.</summary>
 public class VeiculoController
 {
     private const int AnoMinimo = 1990;
@@ -126,7 +125,6 @@ public class VeiculoController
 
     private static Veiculo CriarVeiculo(bool ehCarro) => ehCarro ? new Carro() : new Moto();
 
-    /// <summary>Copia os dados do formulário para o veículo. Serve para o cadastro e para a edição.</summary>
     private static void Preencher(Veiculo veiculo, DadosVeiculo dados, string placa)
     {
         veiculo.Placa = placa;
@@ -150,7 +148,7 @@ public class VeiculoController
         }
     }
 
-    /// <summary>Placa salva sem máscara: sem hífen, sem espaços e em maiúsculas, como o CPF na POO-15.</summary>
+    /// <summary>Placa salva sem máscara: sem hífen, sem espaços e em maiúsculas, como o CPF.</summary>
     private static string NormalizarPlaca(string placa) =>
         placa.Replace("-", string.Empty).Replace(" ", string.Empty).ToUpperInvariant();
 }

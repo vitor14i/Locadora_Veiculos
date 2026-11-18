@@ -2,7 +2,6 @@
 
 namespace FrotaGO.Helpers;
 
-/// <summary>Formata valores, datas e quantidades para exibição na interface.</summary>
 public static class FormatoHelper
 {
     public const string FormatoDataHora = "dd/MM/yyyy HH:mm";
@@ -40,8 +39,6 @@ public static class FormatoHelper
     public static bool TentarLerData(string texto, out DateTime data) =>
         DateTime.TryParseExact(texto.Trim(), FormatoData, CultureInfo.InvariantCulture,
                                DateTimeStyles.None, out data);
-
-    // ---------- Novo na POO-15 ----------
 
     /// <summary>
     /// Coloca a máscara em um CPF ou CNPJ salvo só com números, apenas para exibição.
