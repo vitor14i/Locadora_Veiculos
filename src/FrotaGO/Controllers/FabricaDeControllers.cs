@@ -11,4 +11,21 @@ public static class FabricaDeControllers
         var contexto = new FrotaGODbContext();
         return new ContaController(new UsuarioRepository(contexto), new UnidadeDeTrabalho(contexto));
     }
+
+    public static VeiculoController CriarVeiculoController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new VeiculoController(new VeiculoRepository(contexto), new UnidadeDeTrabalho(contexto));
+    }
+
+    /// <summary>Os quatro objetos usam o mesmo contexto, então um único Salvar() grava tudo.</summary>
+    public static ManutencaoController CriarManutencaoController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new ManutencaoController(
+            new VeiculoRepository(contexto),
+            new ManutencaoRepository(contexto),
+            new UsuarioRepository(contexto),
+            new UnidadeDeTrabalho(contexto));
+    }
 }

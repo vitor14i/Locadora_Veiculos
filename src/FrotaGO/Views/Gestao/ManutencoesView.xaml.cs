@@ -1,29 +1,28 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Models;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Gestao;
 
 public partial class ManutencoesView : UserControl
 {
+    private readonly ManutencaoController _manutencaoController;
+
     public ManutencoesView(string? mensagemSucesso = null)
     {
         InitializeComponent();
+        _manutencaoController = FabricaDeControllers.CriarManutencaoController();
         MostrarMensagem(mensagemSucesso);
         Carregar();
     }
 
     private void Carregar()
     {
-        // TODO: trocar pelas manutenções vindas do controller.
-        TabelaManutencoes.ItemsSource = DadosDeExemplo.Manutencoes
-            .OrderByDescending(manutencao => manutencao.EstaEmAndamento())
-            .ThenByDescending(manutencao => manutencao.DataInicio)
-            .Select(CriarLinha)
-            .ToList();
+        // A ordem (em andamento primeiro, depois as mais recentes) vem do repositório.
+        TabelaManutencoes.ItemsSource = _manutencaoController.Listar().Select(CriarLinha).ToList();
     }
 
     private static LinhaManutencao CriarLinha(Manutencao manutencao) => new(
@@ -44,9 +43,9 @@ public partial class ManutencoesView : UserControl
             "Finalizar manutenção", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (resposta != MessageBoxResult.Yes) return;
 
-        // TODO: trocar pelo controller.
-        DadosDeExemplo.FinalizarManutencao(DadosDeExemplo.Manutencoes.First(item => item.Id == linha.Id));
-        MostrarMensagem("Manutenção finalizada. O veículo está disponível.");
+        // O gerente é o usuário logado. Sem usuário, o id 0 não existe e o controller recusa.
+        var resultado = _manutencaoController.Finalizar(linha.Id, Navegador.Usuario?.Id ?? 0);
+        MostrarMensagem(resultado.Sucesso ? "Manutenção finalizada. O veículo está disponível." : resultado.Erro);
         Carregar();
     }
 

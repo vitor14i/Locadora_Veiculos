@@ -14,6 +14,10 @@ public class UsuarioRepository : IUsuarioRepository
     public Usuario? ObterPorEmail(string email) =>
         _contexto.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
 
+    /// <summary>Rastreado, porque também será usado para alterar dados (POO-20).</summary>
+    public Usuario? ObterPorId(int id) =>
+        _contexto.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
+
     public bool EmailExiste(string email, int? ignorarUsuarioId = null) =>
         _contexto.Usuarios.Any(usuario =>
             usuario.Email == email &&

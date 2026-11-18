@@ -6,6 +6,8 @@ public interface IUsuarioRepository
 {
     Usuario? ObterPorEmail(string email);
 
+    Usuario? ObterPorId(int id);
+
     bool EmailExiste(string email, int? ignorarUsuarioId = null);
 
     bool CpfExiste(string cpf);

@@ -33,7 +33,7 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,16">
                     <TextBlock Text="Placa" Style="{StaticResource TextoRotulo}"/>
-                    <TextBox x:Name="CampoPlaca" MaxLength="7"/>
+                    <TextBox x:Name="CampoPlaca" MaxLength="8"/>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
                     <TextBlock Text="Marca" Style="{StaticResource TextoRotulo}"/>

@@ -1,34 +1,38 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Models;
 using FrotaGO.Models.Enums;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Gestao;
 
 public partial class VeiculoFormView : UserControl
 {
-    private const int AnoMinimo = 1990;
+    private readonly VeiculoController _veiculoController;
 
     /// <summary>Preenchido na edição.</summary>
-    private readonly Veiculo? _veiculo;
+    private readonly int? _veiculoId;
 
     public VeiculoFormView(int? veiculoId = null)
     {
         InitializeComponent();
+        _veiculoController = FabricaDeControllers.CriarVeiculoController();
+        _veiculoId = veiculoId;
 
-        if (veiculoId is int id)
+        // Se o veículo não existir, o Salvar do controller recusa com mensagem.
+        if (veiculoId is int id && _veiculoController.Obter(id) is Veiculo veiculo)
         {
-            // TODO: buscar o veículo pelo controller.
-            _veiculo = DadosDeExemplo.VeiculoDaFrota(id);
-            PreencherCampos(_veiculo);
+            PreencherCampos(veiculo);
         }
 
         AtualizarCamposPorTipo();
     }
 
     private bool EhCarro => OpcaoCarro.IsChecked == true;
+
+    private TipoCambio CambioSelecionado =>
+        OpcaoAutomatico.IsChecked == true ? TipoCambio.Automatico : TipoCambio.Manual;
 
     private void PreencherCampos(Veiculo veiculo)
     {
@@ -71,44 +75,32 @@ public partial class VeiculoFormView : UserControl
 
     private void Salvar_Click(object sender, RoutedEventArgs e)
     {
-        var erro = ValidarFormulario(out var ano, out var km, out var diaria);
+        var erro = LerFormulario(out var dados);
         if (erro is not null)
         {
-            TextoMensagem.Text = erro;
-            TextoMensagem.Visibility = Visibility.Visible;
+            MostrarErro(erro);
             return;
         }
 
-        var veiculo = _veiculo ?? (EhCarro ? new Carro() : new Moto());
-        veiculo.Placa = CampoPlaca.Text.Trim().ToUpperInvariant();
-        veiculo.Marca = CampoMarca.Text.Trim();
-        veiculo.Modelo = CampoModelo.Text.Trim();
-        veiculo.Ano = ano;
-        veiculo.Quilometragem = km;
-        veiculo.ValorDiaria = diaria;
-
-        switch (veiculo)
+        // Sem erro, o LerFormulario sempre preenche os dados.
+        var resultado = _veiculoController.Salvar(dados!, _veiculoId);
+        if (!resultado.Sucesso)
         {
-            case Carro carro:
-                carro.Categoria = CampoCategoria.Text.Trim();
-                carro.NumeroPortas = int.Parse(CampoPortas.Text);
-                carro.Cambio = OpcaoAutomatico.IsChecked == true ? TipoCambio.Automatico : TipoCambio.Manual;
-                break;
-            case Moto moto:
-                moto.Cilindradas = int.Parse(CampoCilindradas.Text);
-                break;
+            MostrarErro(resultado.Erro);
+            return;
         }
 
-        // TODO: trocar pelo controller.
-        DadosDeExemplo.SalvarVeiculo(veiculo);
         Navegador.IrPara(new VeiculosView("Veículo salvo com sucesso."));
     }
 
-    private string? ValidarFormulario(out int ano, out decimal km, out decimal diaria)
+    /// <summary>
+    /// Confere o preenchimento e o formato, convertendo cada campo uma única vez.
+    /// Devolve a mensagem do primeiro campo com problema, ou null com os dados prontos.
+    /// As regras (faixas, categoria, placa repetida e tipo) ficam no VeiculoController.
+    /// </summary>
+    private string? LerFormulario(out DadosVeiculo? dados)
     {
-        ano = 0;
-        km = 0;
-        diaria = 0;
+        dados = null;
 
         TextBox[] obrigatorios = [CampoPlaca, CampoMarca, CampoModelo];
         if (obrigatorios.Any(campo => string.IsNullOrWhiteSpace(campo.Text)))
@@ -116,45 +108,64 @@ public partial class VeiculoFormView : UserControl
             return "Preencha a placa, a marca e o modelo.";
         }
 
-        var placa = CampoPlaca.Text.Trim().ToUpperInvariant();
-        if (DadosDeExemplo.Frota.Any(veiculo => veiculo.Placa == placa && veiculo != _veiculo))
-        {
-            return "Já existe um veículo com essa placa.";
-        }
-
-        if (!int.TryParse(CampoAno.Text, out ano) || ano < AnoMinimo || ano > DateTime.Today.Year + 1)
+        if (!int.TryParse(CampoAno.Text, out var ano))
         {
             return "Informe um ano válido.";
         }
 
-        if (!FormatoHelper.TentarLerQuilometragem(CampoKm.Text, out km))
+        if (!FormatoHelper.TentarLerQuilometragem(CampoKm.Text, out var km))
         {
             return "Informe a quilometragem.";
         }
 
-        if (!FormatoHelper.TentarLerValor(CampoDiaria.Text, out diaria) || diaria <= 0)
+        if (!FormatoHelper.TentarLerValor(CampoDiaria.Text, out var diaria))
         {
             return "Informe o valor da diária.";
         }
 
+        int? portas = null;
+        TipoCambio? cambio = null;
+        int? cilindradas = null;
+
         if (EhCarro)
         {
-            if (string.IsNullOrWhiteSpace(CampoCategoria.Text))
+            if (!int.TryParse(CampoPortas.Text, out var numeroPortas))
             {
-                return "Informe a categoria.";
+                return "Informe o número de portas.";
             }
 
-            if (!int.TryParse(CampoPortas.Text, out var portas) || portas is < 2 or > 5)
-            {
-                return "Informe o número de portas, de 2 a 5.";
-            }
+            portas = numeroPortas;
+            cambio = CambioSelecionado;
         }
-        else if (!int.TryParse(CampoCilindradas.Text, out var cilindradas) || cilindradas <= 0)
+        else
         {
-            return "Informe as cilindradas.";
+            if (!int.TryParse(CampoCilindradas.Text, out var valorCilindradas))
+            {
+                return "Informe as cilindradas.";
+            }
+
+            cilindradas = valorCilindradas;
         }
 
+        dados = new DadosVeiculo(
+            EhCarro: EhCarro,
+            Placa: CampoPlaca.Text,
+            Marca: CampoMarca.Text,
+            Modelo: CampoModelo.Text,
+            Ano: ano,
+            Quilometragem: km,
+            ValorDiaria: diaria,
+            Categoria: EhCarro ? CampoCategoria.Text : string.Empty,
+            NumeroPortas: portas,
+            Cambio: cambio,
+            Cilindradas: cilindradas);
         return null;
+    }
+
+    private void MostrarErro(string texto)
+    {
+        TextoMensagem.Text = texto;
+        TextoMensagem.Visibility = Visibility.Visible;
     }
 
     private void Cancelar_Click(object sender, RoutedEventArgs e) =>

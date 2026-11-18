@@ -1,18 +1,21 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Models;
 using FrotaGO.Models.Enums;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Gestao;
 
 public partial class VeiculosView : UserControl
 {
+    private readonly VeiculoController _veiculoController;
+
     public VeiculosView(string? mensagemSucesso = null)
     {
         InitializeComponent();
+        _veiculoController = FabricaDeControllers.CriarVeiculoController();
 
         if (mensagemSucesso is not null)
         {
@@ -20,8 +23,7 @@ public partial class VeiculosView : UserControl
             TextoMensagem.Visibility = Visibility.Visible;
         }
 
-        // TODO: trocar pelos veículos vindos do controller.
-        TabelaVeiculos.ItemsSource = DadosDeExemplo.Frota.Select(CriarLinha).ToList();
+        TabelaVeiculos.ItemsSource = _veiculoController.ListarTodos().Select(CriarLinha).ToList();
     }
 
     private static LinhaVeiculo CriarLinha(Veiculo veiculo) => new(
