@@ -1,21 +1,20 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Models;
-using FrotaGO.Models.Enums;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Gestao;
 
 public partial class ManutencaoFormView : UserControl
 {
+    private readonly ManutencaoController _manutencaoController;
+
     public ManutencaoFormView()
     {
         InitializeComponent();
+        _manutencaoController = FabricaDeControllers.CriarManutencaoController();
 
-        // TODO: trocar pelos veículos disponíveis vindos do controller.
-        CampoVeiculo.ItemsSource = DadosDeExemplo.Frota
-            .Where(veiculo => veiculo.Status == StatusVeiculo.Disponivel)
-            .ToList();
+        CampoVeiculo.ItemsSource = _manutencaoController.ListarVeiculosDisponiveis();
     }
 
     private void Iniciar_Click(object sender, RoutedEventArgs e)
@@ -32,8 +31,14 @@ public partial class ManutencaoFormView : UserControl
             return;
         }
 
-        // TODO: trocar pelo controller, registrando também o gerente responsável.
-        DadosDeExemplo.IniciarManutencao(veiculo, CampoDescricao.Text.Trim());
+        // O gerente responsável é o usuário logado. Sem usuário, o id 0 não existe e o controller recusa.
+        var resultado = _manutencaoController.Iniciar(veiculo.Id, CampoDescricao.Text, Navegador.Usuario?.Id ?? 0);
+        if (!resultado.Sucesso)
+        {
+            MostrarErro(resultado.Erro);
+            return;
+        }
+
         Navegador.IrPara(new ManutencoesView("Manutenção iniciada. O veículo está indisponível para reservas."));
     }
 
