@@ -90,7 +90,8 @@ public static class MapeadorDeTela
                 Detalhe1 = reserva.Contrato!.Devolucao is { } devolucao
                     ? $"Devolvido em: {FormatoHelper.DiaEHora(devolucao.DataDevolucao)}"
                     : string.Empty,
-                Detalhe3 = $"Valor final: {FormatoHelper.Moeda(reserva.Contrato.ValorTotal)}"
+                // A locação mais as multas pagas. Os pagamentos só vêm no ListarPorCliente.
+                Detalhe3 = $"Valor final: {FormatoHelper.Moeda(reserva.Contrato.Pagamentos.Sum(pagamento => pagamento.Valor))}"
             },
             _ => new()
             {
