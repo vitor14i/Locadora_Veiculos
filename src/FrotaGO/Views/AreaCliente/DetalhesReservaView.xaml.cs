@@ -32,23 +32,23 @@ public partial class DetalhesReservaView : UserControl
 
         TextoNumero.Text = $"Reserva nº {reserva.Id}";
         PainelStatus.DataContext = card;
-        Resumo.DataContext = MontarResumo(reserva, card.Status);
+        Resumo.DataContext = MontarResumo(reserva);
         ConfigurarAcoes(card.Status);
     }
 
-    private static ResumoReservaItem MontarResumo(Reserva reserva, string status)
+    private static ResumoReservaItem MontarResumo(Reserva reserva)
     {
-        var rotuloTotal = status is MapeadorDeTela.StatusAtiva or MapeadorDeTela.StatusConcluida
-            ? "Valor total"
-            : "Valor estimado";
-        var veiculo = MapeadorDeTela.CriarItem(reserva.Veiculo!).ParaPeriodo(reserva.DataInicio, reserva.DataFim);
-        var resumo = ResumoReservaItem.Criar(veiculo, reserva.DataInicio, reserva.DataFim, rotuloTotal);
-
-        if (reserva.Contrato is not null)
+        if (reserva.Contrato is null)
         {
-            resumo.Linhas.Insert(0, new DetalheLinha("Contrato", $"nº {reserva.Contrato.Id}"));
+            var estimado = MapeadorDeTela.CriarItem(reserva.Veiculo!).ParaPeriodo(reserva.DataInicio, reserva.DataFim);
+            return ResumoReservaItem.Criar(estimado, reserva.DataInicio, reserva.DataFim, "Valor estimado");
         }
 
+        // Com contrato, vale o valor gravado na retirada, e não o preço atual do veículo.
+        var itemContrato = reserva.Contrato.Itens.First(item => item.VeiculoId == reserva.VeiculoId);
+        var resumo = ResumoReservaItem.Criar(MapeadorDeTela.CriarItem(itemContrato),
+                                             reserva.DataInicio, reserva.DataFim, "Valor total");
+        resumo.Linhas.Insert(0, new DetalheLinha("Contrato", $"nº {reserva.Contrato.Id}"));
         return resumo;
     }
 
