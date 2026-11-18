@@ -1,22 +1,22 @@
-﻿using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
+using FrotaGO.Helpers;
 using FrotaGO.Views.AreaFuncionario;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Acesso;
 
 public partial class CriarContaView : UserControl
 {
-    private const int TamanhoMinimoSenha = 8;
-    private const string FormatoData = "dd/MM/yyyy";
-
     /// <summary>Verdadeiro quando um funcionário cadastra um cliente atendido na loja.</summary>
     private readonly bool _modoFuncionario;
+
+    private readonly ContaController _contaController;
 
     public CriarContaView(bool modoFuncionario = false)
     {
         InitializeComponent();
+        _contaController = FabricaDeControllers.CriarContaController();
         _modoFuncionario = modoFuncionario;
 
         if (modoFuncionario)
@@ -66,13 +66,12 @@ public partial class CriarContaView : UserControl
             return;
         }
 
-        // Pessoa jurídica aparece na lista pela razão social.
-        var nome = EhPessoaFisica ? CampoNome.Text.Trim() : CampoComplemento.Text.Trim();
-        var documento = $"{RotuloDocumento.Text} {CampoDocumento.Text.Trim()}";
-
-        // TODO: trocar pelo controller, que valida e salva o cliente com a senha em hash.
-        DadosDeExemplo.AdicionarCliente(nome, documento, CampoEmail.Text.Trim().ToLowerInvariant(),
-                                        CampoTelefone.Text.Trim());
+        var resultado = _contaController.CadastrarCliente(LerFormulario());
+        if (!resultado.Sucesso)
+        {
+            MostrarErro(resultado.Erro);
+            return;
+        }
 
         if (_modoFuncionario)
         {
@@ -84,7 +83,26 @@ public partial class CriarContaView : UserControl
                          mostrarCabecalho: false);
     }
 
-    /// <summary>Validações de preenchimento da tela. As regras de negócio também são validadas no controller.</summary>
+    /// <summary>Junta os campos da tela para o controller. A data já chega convertida.</summary>
+    private DadosCliente LerFormulario() => new(
+        EhPessoaFisica,
+        CampoNome.Text,
+        CampoDocumento.Text,
+        CampoComplemento.Text,
+        CampoEmail.Text,
+        CampoTelefone.Text,
+        CampoEndereco.Text,
+        LerDataNascimento(),
+        CampoSenha.Password);
+
+    /// <summary>Converte a data de nascimento. Só é chamado depois de ValidarFormulario conferir o formato.</summary>
+    private DateTime? LerDataNascimento() =>
+        EhPessoaFisica && FormatoHelper.TentarLerData(CampoNascimento.Text, out var data) ? data : null;
+
+    /// <summary>
+    /// Validações de preenchimento da tela: campos vazios, formato da data e confirmação da senha.
+    /// As regras de negócio ficam no ContaController.
+    /// </summary>
     private string? ValidarFormulario()
     {
         TextBox[] obrigatorios = [CampoNome, CampoDocumento, CampoComplemento,
@@ -96,27 +114,9 @@ public partial class CriarContaView : UserControl
             return "Preencha todos os campos.";
         }
 
-        var email = CampoEmail.Text.Trim().ToLowerInvariant();
-        if (!email.Contains('@'))
-        {
-            return "Informe um e-mail válido.";
-        }
-
-        if (DadosDeExemplo.Clientes.Any(cliente => cliente.Email == email))
-        {
-            return "Este e-mail já está cadastrado.";
-        }
-
-        if (EhPessoaFisica && !DateTime.TryParseExact(
-                CampoNascimento.Text, FormatoData, CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+        if (EhPessoaFisica && !FormatoHelper.TentarLerData(CampoNascimento.Text, out _))
         {
             return "Informe a data de nascimento no formato dd/mm/aaaa.";
-        }
-
-        if (CampoSenha.Password.Length < TamanhoMinimoSenha)
-        {
-            return $"A senha deve ter pelo menos {TamanhoMinimoSenha} caracteres.";
         }
 
         if (CampoSenha.Password != CampoConfirmarSenha.Password)

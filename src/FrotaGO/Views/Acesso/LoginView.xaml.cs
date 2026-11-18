@@ -1,30 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using System.Globalization;
+using FrotaGO.Controllers;
+using FrotaGO.Models;
 using FrotaGO.Views.AreaCliente;
 using FrotaGO.Views.AreaFuncionario;
 
 namespace FrotaGO.Views.Acesso;
-using FrotaGO.Views.Exemplos;
 
 public partial class LoginView : UserControl
 {
+    private readonly ContaController _contaController;
+
     public LoginView(string? mensagemSucesso = null)
     {
         InitializeComponent();
+        _contaController = FabricaDeControllers.CriarContaController();
 
         if (mensagemSucesso is not null)
         {
@@ -40,31 +31,28 @@ public partial class LoginView : UserControl
             return;
         }
 
-        // TODO: trocar por ContaController.Login quando estiver pronto.
-        EntrarTemporariamente(CampoEmail.Text.Trim().ToLowerInvariant());
+        var resultado = _contaController.Entrar(CampoEmail.Text, CampoSenha.Password);
+        if (!resultado.Sucesso)
+        {
+            MostrarMensagem(resultado.Erro);
+            return;
+        }
+
+        AbrirHome(resultado.Valor);
     }
 
-    /// <summary>Login provisório, sem verificar a senha, apenas para navegar entre as telas.</summary>
-    private static void EntrarTemporariamente(string email)
+    /// <summary>Guarda o usuário na sessão e abre a home do perfil dele.</summary>
+    private static void AbrirHome(Usuario usuario)
     {
-        var nome = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(email.Split('@')[0]);
+        var sessao = UsuarioSessao.De(usuario);
 
-        switch (email)
+        if (sessao.EhCliente)
         {
-            case "gerente@frotago.com":
-                Navegador.Entrar(new UsuarioSessao(nome, email, "Gerente"),
-                                 () => new HomeFuncionarioView(nome, ehGerente: true));
-                break;
-            case "ana@frotago.com":
-            case "bruno@frotago.com":
-                Navegador.Entrar(new UsuarioSessao(nome, email, "Atendente"),
-                                 () => new HomeFuncionarioView(nome, ehGerente: false));
-                break;
-            default:
-                var cliente = DadosDeExemplo.ClienteAtual;
-                Navegador.Entrar(new UsuarioSessao(cliente.Nome, email, "Cliente"),
-                                 () => new HomeClienteView(cliente.Nome));
-                break;
+            Navegador.Entrar(sessao, () => new HomeClienteView(sessao.Nome));
+        }
+        else
+        {
+            Navegador.Entrar(sessao, () => new HomeFuncionarioView(sessao.Nome, sessao.EhGerente));
         }
     }
 

@@ -6,6 +6,9 @@ namespace FrotaGO.Helpers;
 /// </summary>
 public static class DocumentoHelper
 {
+    public const int DigitosCpf = 11;
+    public const int DigitosCnpj = 14;
+
     public static string SomenteNumeros(string? documento) =>
         string.IsNullOrEmpty(documento)
             ? string.Empty

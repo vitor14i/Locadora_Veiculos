@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace FrotaGO.Helpers;
 
@@ -45,5 +40,18 @@ public static class FormatoHelper
     public static bool TentarLerData(string texto, out DateTime data) =>
         DateTime.TryParseExact(texto.Trim(), FormatoData, CultureInfo.InvariantCulture,
                                DateTimeStyles.None, out data);
+
+    // ---------- Novo na POO-15 ----------
+
+    /// <summary>
+    /// Coloca a máscara em um CPF ou CNPJ salvo só com números, apenas para exibição.
+    /// Outros tamanhos aparecem como estão.
+    /// </summary>
+    public static string Documento(string documento) => documento.Length switch
+    {
+        DocumentoHelper.DigitosCpf => $"{documento[..3]}.{documento[3..6]}.{documento[6..9]}-{documento[9..]}",
+        DocumentoHelper.DigitosCnpj => $"{documento[..2]}.{documento[2..5]}.{documento[5..8]}/{documento[8..12]}-{documento[12..]}",
+        _ => documento
+    };
 }
 
