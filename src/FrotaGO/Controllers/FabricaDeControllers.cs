@@ -28,4 +28,15 @@ public static class FabricaDeControllers
             new UsuarioRepository(contexto),
             new UnidadeDeTrabalho(contexto));
     }
+
+    /// <summary>Os quatro objetos usam o mesmo contexto, então um único Salvar() grava tudo.</summary>
+    public static ReservaController CriarReservaController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new ReservaController(
+            new ReservaRepository(contexto),
+            new VeiculoRepository(contexto),
+            new UsuarioRepository(contexto),
+            new UnidadeDeTrabalho(contexto));
+    }
 }

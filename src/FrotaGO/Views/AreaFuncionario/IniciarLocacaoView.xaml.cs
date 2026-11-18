@@ -1,46 +1,59 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
+using FrotaGO.Models;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaFuncionario;
 
 public partial class IniciarLocacaoView : UserControl
 {
-    private readonly ReservaExemplo _reserva;
+    private readonly ReservaController _reservaController;
+    private readonly Reserva? _reserva;
 
     public IniciarLocacaoView(int reservaId)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
 
-        // TODO: buscar a reserva pelo controller.
-        _reserva = DadosDeExemplo.Buscar(reservaId);
+        // A reserva vem do controller, com cliente, veículo e contrato.
+        _reserva = _reservaController.Obter(reservaId);
+        if (_reserva is null)
+        {
+            MostrarErro("Reserva não encontrada.");
+            return;
+        }
 
-        var resumo = ResumoReservaItem.Criar(_reserva.Veiculo, _reserva.Retirada, _reserva.Devolucao, "Valor total");
-        resumo.Linhas.InsertRange(0, [new("Cliente", _reserva.Cliente.Nome),
-                                      new("Documento", _reserva.Cliente.Documento)]);
+        var veiculo = MapeadorDeTela.CriarItem(_reserva.Veiculo!).ParaPeriodo(_reserva.DataInicio, _reserva.DataFim);
+        var cliente = MapeadorDeTela.CriarClienteItem(_reserva.Cliente!);
+
+        var resumo = ResumoReservaItem.Criar(veiculo, _reserva.DataInicio, _reserva.DataFim, "Valor total");
+        resumo.Linhas.InsertRange(0, [new("Cliente", cliente.Nome),
+                                      new("Documento", cliente.Documento)]);
         Resumo.DataContext = resumo;
-        SecaoPagamento.Valor = _reserva.Veiculo.Total;
+        SecaoPagamento.Valor = veiculo.Total;
     }
 
     private void IniciarLocacao_Click(object sender, RoutedEventArgs e)
     {
-        var erro = Validar(out var kmSaida);
+        if (_reserva is null)
+        {
+            MostrarErro("Reserva não encontrada.");
+            return;
+        }
+
+        var erro = Validar(out _);
         if (erro is not null)
         {
             MostrarErro(erro);
             return;
         }
 
-        // TODO: trocar pelo controller: cria o Contrato, o ItemContrato e o Pagamento,
+        // TODO (POO-18): trocar pelo controller: cria o Contrato, o ItemContrato e o Pagamento,
         // converte a reserva e marca o veículo como alugado.
-        var contrato = DadosDeExemplo.IniciarLocacao(_reserva.Id, kmSaida);
-
-        MessageBox.Show(
-            $"Locação iniciada. Contrato nº {contrato}.\nPagamento por {SecaoPagamento.Descricao}.",
-            "Locação iniciada", MessageBoxButton.OK, MessageBoxImage.Information);
-        Navegador.IrParaHome();
+        MessageBox.Show("O início da locação ainda não está disponível.", "Iniciar locação",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private string? Validar(out decimal kmSaida)

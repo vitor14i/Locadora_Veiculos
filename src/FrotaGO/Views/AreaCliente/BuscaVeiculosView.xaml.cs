@@ -1,21 +1,26 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
 public partial class BuscaVeiculosView : UserControl
 {
+    private readonly ReservaController _reservaController;
+    private readonly ContaController _contaController;
+
     private DateTime _retirada;
     private DateTime _devolucao;
     private readonly bool _modoFuncionario;
 
     /// <summary>Se o período for informado, por exemplo ao voltar da revisão, a busca é refeita.</summary>
-    public BuscaVeiculosView(DateTime? retirada = null, DateTime? devolucao = null, bool modoFuncionario = false, ClienteExemplo? cliente = null)
+    public BuscaVeiculosView(DateTime? retirada = null, DateTime? devolucao = null, bool modoFuncionario = false, ClienteItem? cliente = null)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
+        _contaController = FabricaDeControllers.CriarContaController();
         _modoFuncionario = modoFuncionario;
 
         if (modoFuncionario)
@@ -31,27 +36,25 @@ public partial class BuscaVeiculosView : UserControl
         CampoRetirada.Text = FormatoHelper.DataHoraCampo(retirada ?? retiradaPadrao);
         CampoDevolucao.Text = FormatoHelper.DataHoraCampo(devolucao ?? retiradaPadrao.AddDays(3));
 
-        var erro = _modoFuncionario && ClienteSelecionado is null
-            ? "Escolha o cliente."
-            : LerPeriodo();
-
         if (retirada.HasValue && devolucao.HasValue)
         {
             Buscar();
         }
     }
 
-    private ClienteExemplo? ClienteSelecionado =>
-    _modoFuncionario ? CampoCliente.SelectedItem as ClienteExemplo : null;
+    private ClienteItem? ClienteSelecionado =>
+        _modoFuncionario ? CampoCliente.SelectedItem as ClienteItem : null;
 
-    private void ConfigurarModoFuncionario(ClienteExemplo? cliente)
+    private void ConfigurarModoFuncionario(ClienteItem? cliente)
     {
         TituloTela.Text = "Nova reserva";
         SubtituloTela.Text = "Escolha o cliente, o período e o veículo.";
         PainelCliente.Visibility = Visibility.Visible;
 
-        // TODO: trocar pela lista de clientes vinda do controller.
-        CampoCliente.ItemsSource = DadosDeExemplo.Clientes;
+        CampoCliente.ItemsSource = _contaController.ListarClientesAtivos()
+            .Select(MapeadorDeTela.CriarClienteItem)
+            .OrderBy(item => item.Nome)
+            .ToList();
         CampoCliente.SelectedItem = cliente;
     }
 
@@ -74,12 +77,19 @@ public partial class BuscaVeiculosView : UserControl
             return;
         }
 
+        // As regras do período (retirada futura e devolução depois da retirada) ficam no controller.
+        var resultado = _reservaController.BuscarDisponiveis(_retirada, _devolucao, TipoSelecionado);
+        if (!resultado.Sucesso)
+        {
+            MostrarErro(resultado.Erro);
+            ListaVeiculos.ItemsSource = null;
+            return;
+        }
+
         TextoMensagem.Visibility = Visibility.Collapsed;
 
-        // TODO: trocar pelos veículos disponíveis vindos do controller
-        // (sem reserva no período e sem manutenção em andamento).
-        var veiculos = DadosDeExemplo.Veiculos
-            .Where(veiculo => TipoSelecionado is null || veiculo.Tipo == TipoSelecionado)
+        var veiculos = resultado.Valor
+            .Select(MapeadorDeTela.CriarItem)
             .Select(veiculo => veiculo.ParaPeriodo(_retirada, _devolucao))
             .ToList();
 
@@ -98,16 +108,6 @@ public partial class BuscaVeiculosView : UserControl
             return "Informe as datas no formato dd/mm/aaaa hh:mm.";
         }
 
-        if (_retirada < DateTime.Now)
-        {
-            return "A retirada deve ser em uma data futura.";
-        }
-
-        if (_devolucao <= _retirada)
-        {
-            return "A devolução deve ser depois da retirada.";
-        }
-
         return null;
     }
 
@@ -115,6 +115,13 @@ public partial class BuscaVeiculosView : UserControl
     {
         if (e.OriginalSource is FrameworkElement { DataContext: VeiculoItem veiculo })
         {
+            // No balcão, a reserva precisa de um cliente escolhido.
+            if (_modoFuncionario && ClienteSelecionado is null)
+            {
+                MostrarErro("Escolha o cliente.");
+                return;
+            }
+
             Navegador.IrPara(new RevisarReservaView(veiculo, _retirada, _devolucao, ClienteSelecionado));
         }
     }

@@ -1,37 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
 public partial class HomeClienteView : UserControl
 {
+    private readonly ReservaController _reservaController;
+
     public HomeClienteView(string nomeCliente)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
         TextoSaudacao.Text = $"Olá, {NomeHelper.PrimeiroNome(nomeCliente)}";
 
-        // TODO: substituir pelos dados vindos do controller.
-        var cards = DadosDeExemplo.ReservasDoClienteAtual()
-        .Where(reserva => reserva.Status is "Ativa" or "Agendada")
-        .OrderBy(reserva => reserva.Retirada)
-        .Take(2)
-        .Select(DadosDeExemplo.CriarCard)
-        .ToList();
+        var cards = _reservaController.ListarDoCliente(Navegador.Usuario!.Id)
+            .Where(reserva => MapeadorDeTela.TextoStatus(reserva) is MapeadorDeTela.StatusAtiva
+                                                                  or MapeadorDeTela.StatusAgendada)
+            .OrderBy(reserva => reserva.DataInicio)
+            .Take(2)
+            .Select(MapeadorDeTela.CriarCard)
+            .ToList();
 
         ExibirCards(cards);
     }
@@ -45,8 +36,8 @@ public partial class HomeClienteView : UserControl
 
     private static string MontarResumo(IReadOnlyList<CardReservaItem> cards)
     {
-        var ativas = cards.Count(card => card.Status == "Ativa");
-        var agendadas = cards.Count(card => card.Status == "Agendada");
+        var ativas = cards.Count(card => card.Status == MapeadorDeTela.StatusAtiva);
+        var agendadas = cards.Count(card => card.Status == MapeadorDeTela.StatusAgendada);
 
         var partes = new List<string>();
         if (ativas > 0) partes.Add(ativas == 1 ? "1 locação ativa" : $"{ativas} locações ativas");

@@ -9,6 +9,8 @@ public interface IVeiculoRepository
 
     List<Veiculo> ListarPorStatus(StatusVeiculo status);
 
+    List<Veiculo> ListarDisponiveis(DateTime inicio, DateTime fim, string? tipo, DateTime agora);
+
     Veiculo? ObterPorId(int id);
 
     bool PlacaExiste(string placa, int? ignorarVeiculoId = null);

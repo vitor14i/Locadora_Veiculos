@@ -1,35 +1,25 @@
-﻿using FrotaGO.Helpers;
+﻿using System.Windows;
+using System.Windows.Controls;
+using FrotaGO.Controllers;
+using FrotaGO.Helpers;
 using FrotaGO.Views.AreaCliente;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using FrotaGO.Views.Gestao;
 
 namespace FrotaGO.Views.AreaFuncionario;
 
 public partial class HomeFuncionarioView : UserControl
 {
+    private readonly ReservaController _reservaController;
+
     public HomeFuncionarioView(string nomeFuncionario, bool ehGerente)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
         TextoSaudacao.Text = $"Olá, {NomeHelper.PrimeiroNome(nomeFuncionario)}";
         LinhaGestao.Visibility = ehGerente ? Visibility.Visible : Visibility.Collapsed;
 
-        // TODO: substituir pelas visitas do dia vindas do controller.
-        ExibirVisitas(DadosDeExemplo.VisitasDeHoje());
+        ExibirVisitas(_reservaController.ListarVisitasDeHoje().Select(MapeadorDeTela.CriarVisita).ToList());
     }
 
     private void ExibirVisitas(IReadOnlyList<VisitaItem> visitas)
