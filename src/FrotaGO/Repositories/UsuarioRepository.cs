@@ -14,7 +14,7 @@ public class UsuarioRepository : IUsuarioRepository
     public Usuario? ObterPorEmail(string email) =>
         _contexto.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
 
-    /// <summary>Rastreado, porque também será usado para alterar dados (POO-20).</summary>
+    /// <summary>Rastreado, porque também é usado para alterar dados: perfil, senha e situação do atendente.</summary>
     public Usuario? ObterPorId(int id) =>
         _contexto.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
 
@@ -34,6 +34,15 @@ public class UsuarioRepository : IUsuarioRepository
             .AsNoTracking()
             .Where(cliente => cliente.Ativo)
             .ToList();
+
+    public List<Atendente> ListarAtendentes() =>
+        _contexto.Atendentes
+            .AsNoTracking()
+            .OrderBy(atendente => atendente.Nome)
+            .ToList();
+
+    public bool MatriculaExiste(string matricula) =>
+        _contexto.Funcionarios.Any(funcionario => funcionario.Matricula == matricula);
 
     public void Adicionar(Usuario usuario) => _contexto.Usuarios.Add(usuario);
 }
