@@ -10,7 +10,7 @@ public class Vistoria
     public int DevolucaoId { get; set; }
     public Devolucao? Devolucao { get; set; }
     public int ItemContratoId { get; set; }
-    public ItemContrato? ItemContrato { get; set; } // 1x1
+    public ItemContrato? ItemContrato { get; set; }
 
     public decimal CalcularKmRodados(decimal kmInicial) => KmFinal - kmInicial;
 }

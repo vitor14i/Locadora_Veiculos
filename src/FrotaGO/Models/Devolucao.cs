@@ -7,9 +7,9 @@ public class Devolucao
     public string Observacoes { get; set; } = string.Empty;
 
     public int ContratoId { get; set; }
-    public Contrato? Contrato { get; set; }                  // 1x1
-    public List<Vistoria> Vistorias { get; set; } = new();   // composição 1..*
-    public List<Multa> Multas { get; set; } = new();         // composição 0..*
+    public Contrato? Contrato { get; set; }
+    public List<Vistoria> Vistorias { get; set; } = new();
+    public List<Multa> Multas { get; set; } = new();
 
     public int CalcularDiasAtraso(DateTime dataFimPrevista) =>
         Math.Max(0, (DataDevolucao.Date - dataFimPrevista.Date).Days);

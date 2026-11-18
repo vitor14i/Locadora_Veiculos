@@ -6,7 +6,6 @@ public class PessoaJuridica : Cliente
 {
     private string _cnpj = string.Empty;
 
-    /// <summary>CNPJ salvo sem máscara (somente 14 dígitos). A máscara é removida ao atribuir.</summary>
     public string Cnpj
     {
         get => _cnpj;

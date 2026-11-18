@@ -6,7 +6,6 @@ public class PessoaFisica : Cliente
 {
     private string _cpf = string.Empty;
 
-    /// <summary>CPF salvo sem máscara (somente 11 dígitos). A máscara é removida ao atribuir.</summary>
     public string Cpf
     {
         get => _cpf;

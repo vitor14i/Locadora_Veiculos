@@ -16,7 +16,7 @@ public abstract class Veiculo : ITarifa
     public List<Manutencao> Manutencoes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();
     public List<ItemContrato> ItensContrato { get; set; } = new();
-    public List<Contrato> Contratos { get; set; } = new(); // NxN via ItemContrato
+    public List<Contrato> Contratos { get; set; } = new();
 
     public abstract decimal Calcular(int dias);
 }
