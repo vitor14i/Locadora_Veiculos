@@ -38,7 +38,9 @@
                 <TextBox x:Name="CampoValorAvaria" TextChanged="Campo_TextChanged"/>
             </StackPanel>
 
-            <CheckBox x:Name="CampoManutencao" Content="Enviar veículo para manutenção" Margin="0,12,0,0"/>
+            <!-- Só o gerente vê esta opção. O código mostra o campo. -->
+            <CheckBox x:Name="CampoManutencao" Content="Enviar veículo para manutenção" Margin="0,12,0,0"
+                      Visibility="Collapsed"/>
 
             <!-- Cobranças -->
             <TextBlock Text="Multas" Style="{StaticResource TextoSecao}"/>
@@ -94,9 +96,8 @@
             <Grid Margin="0,24,0,0">
                 <Button Content="Voltar" Style="{StaticResource BotaoSecundario}"
                         HorizontalAlignment="Left" Click="Voltar_Click"/>
-                <!-- Desabilitado até a POO-19, que registra a devolução no banco. -->
                 <Button Content="Concluir devolução" Style="{StaticResource BotaoPrincipal}"
-                        HorizontalAlignment="Right" IsEnabled="False" Click="ConcluirDevolucao_Click"/>
+                        HorizontalAlignment="Right" Click="ConcluirDevolucao_Click"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>
