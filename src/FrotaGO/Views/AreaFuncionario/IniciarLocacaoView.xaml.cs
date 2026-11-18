@@ -10,12 +10,14 @@ namespace FrotaGO.Views.AreaFuncionario;
 public partial class IniciarLocacaoView : UserControl
 {
     private readonly ReservaController _reservaController;
+    private readonly LocacaoController _locacaoController;
     private readonly Reserva? _reserva;
 
     public IniciarLocacaoView(int reservaId)
     {
         InitializeComponent();
         _reservaController = FabricaDeControllers.CriarReservaController();
+        _locacaoController = FabricaDeControllers.CriarLocacaoController();
 
         // A reserva vem do controller, com cliente, veículo e contrato.
         _reserva = _reservaController.Obter(reservaId);
@@ -43,29 +45,33 @@ public partial class IniciarLocacaoView : UserControl
             return;
         }
 
-        var erro = Validar(out _);
+        var erro = Validar(out var kmSaida);
         if (erro is not null)
         {
             MostrarErro(erro);
             return;
         }
 
-        // TODO (POO-18): trocar pelo controller: cria o Contrato, o ItemContrato e o Pagamento,
-        // converte a reserva e marca o veículo como alugado.
-        MessageBox.Show("O início da locação ainda não está disponível.", "Iniciar locação",
+        // As regras de negócio, inclusive a dos documentos, ficam no controller.
+        var resultado = _locacaoController.IniciarLocacao(_reserva.Id, kmSaida, CampoDocumentos.IsChecked == true,
+                                                          SecaoPagamento.CriarPagamento());
+        if (!resultado.Sucesso)
+        {
+            MostrarErro(resultado.Erro);
+            return;
+        }
+
+        MessageBox.Show($"Locação iniciada. Contrato nº {resultado.Valor.Id}.", "Iniciar locação",
                         MessageBoxButton.OK, MessageBoxImage.Information);
+        Navegador.IrParaHome();
     }
 
+    /// <summary>Só o preenchimento: o formato da quilometragem e os dados do pagamento.</summary>
     private string? Validar(out decimal kmSaida)
     {
         if (!FormatoHelper.TentarLerQuilometragem(CampoKmSaida.Text, out kmSaida))
         {
             return "Informe a quilometragem de saída.";
-        }
-
-        if (CampoDocumentos.IsChecked != true)
-        {
-            return "Confira o documento com foto e a CNH do condutor.";
         }
 
         return SecaoPagamento.Validar();

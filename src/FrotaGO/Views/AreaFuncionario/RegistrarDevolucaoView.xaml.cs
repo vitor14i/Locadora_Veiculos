@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Models;
 using FrotaGO.Models.Enums;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaFuncionario;
 
@@ -14,7 +14,10 @@ public partial class RegistrarDevolucaoView : UserControl
     private const decimal LimiteKmPorDiaria = 200m;
     private const decimal ValorPorKmExcedente = 1.00m;
 
-    private readonly ReservaExemplo _reserva;
+    private readonly LocacaoController _locacaoController;
+
+    /// <summary>Contrato com a reserva, o cliente e os itens. Fica nulo se não for encontrado.</summary>
+    private readonly Contrato? _contrato;
 
     /// <summary>Tipos de multa cancelados pelo gerente, como "Atraso" ou "Avaria".</summary>
     private readonly HashSet<string> _multasCanceladas = [];
@@ -23,23 +26,37 @@ public partial class RegistrarDevolucaoView : UserControl
     private decimal _desconto;
     private decimal _total;
 
-    public RegistrarDevolucaoView(int reservaId)
+    public RegistrarDevolucaoView(int contratoId)
     {
         InitializeComponent();
+        _locacaoController = FabricaDeControllers.CriarLocacaoController();
 
-        // TODO: buscar a locação pelo controller.
-        _reserva = DadosDeExemplo.Buscar(reservaId);
+        _contrato = _locacaoController.ObterContrato(contratoId);
+        if (_contrato is null)
+        {
+            TextoMensagem.Text = "Locação não encontrada.";
+            TextoMensagem.Visibility = Visibility.Visible;
+            return;
+        }
 
-        var resumo = ResumoReservaItem.Criar(_reserva.Veiculo, _reserva.Retirada, _reserva.Devolucao,
-                                             "Valor da locação");
-        resumo.Linhas.InsertRange(0, [new("Cliente", _reserva.Cliente.Nome),
-                                      new("Contrato", $"nº {_reserva.Contrato}"),
-                                      new("Km de saída", $"{_reserva.KmSaida:N0}")]);
+        var veiculo = MapeadorDeTela.CriarItem(Item);
+        var cliente = MapeadorDeTela.CriarClienteItem(Reserva.Cliente!);
+
+        var resumo = ResumoReservaItem.Criar(veiculo, Reserva.DataInicio, Reserva.DataFim, "Valor da locação");
+        resumo.Linhas.InsertRange(0, [new("Cliente", cliente.Nome),
+                                      new("Contrato", $"nº {_contrato.Id}"),
+                                      new("Km de saída", $"{Item.KmInicial:N0}")]);
         Resumo.DataContext = resumo;
 
         CampoDataDevolucao.Text = FormatoHelper.DataHoraCampo(DateTime.Now);
         Recalcular();
     }
+
+    // Só são usados depois de o contrato ser encontrado.
+    private Reserva Reserva => _contrato!.Reserva!;
+
+    /// <summary>A reserva tem um único veículo, então o contrato tem um único item.</summary>
+    private ItemContrato Item => _contrato!.Itens.First();
 
     private static bool UsuarioEhGerente => Navegador.Usuario?.EhGerente == true;
 
@@ -51,7 +68,8 @@ public partial class RegistrarDevolucaoView : UserControl
     private void Recalcular()
     {
         // Os eventos também disparam durante o InitializeComponent.
-        if (!IsInitialized) return;
+        // Sem contrato, não há o que calcular.
+        if (!IsInitialized || _contrato is null) return;
 
         PainelAvaria.Visibility = CampoAvaria.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         PainelDesconto.Visibility = UsuarioEhGerente ? Visibility.Visible : Visibility.Collapsed;
@@ -82,29 +100,31 @@ public partial class RegistrarDevolucaoView : UserControl
         SecaoPagamento.Valor = _total;
     }
 
-    /// <summary>Usa as regras dos models Devolucao e Vistoria para calcular as multas.</summary>
+    /// <summary>
+    /// Usa as regras dos models Devolucao e Vistoria para calcular as multas.
+    /// A diária, as diárias e o km de saída vêm do item do contrato.
+    /// </summary>
     private List<Multa> CalcularMultas()
     {
         var multas = new List<Multa>();
 
         if (FormatoHelper.TentarLerDataHora(CampoDataDevolucao.Text, out var dataDevolucao))
         {
-            var diasAtraso = new Devolucao { DataDevolucao = dataDevolucao }.CalcularDiasAtraso(_reserva.Devolucao);
+            var diasAtraso = new Devolucao { DataDevolucao = dataDevolucao }.CalcularDiasAtraso(Reserva.DataFim);
             if (diasAtraso > 0)
             {
                 multas.Add(new Multa
                 {
                     Motivo = $"Atraso · {FormatoHelper.Quantidade(diasAtraso, "dia", "dias")}",
-                    Valor = diasAtraso * _reserva.Veiculo.Diaria
+                    Valor = diasAtraso * Item.ValorDiaria
                 });
             }
         }
 
-        if (FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var kmChegada) &&
-            _reserva.KmSaida is decimal kmSaida)
+        if (FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var kmChegada))
         {
-            var kmRodados = new Vistoria { KmFinal = kmChegada }.CalcularKmRodados(kmSaida);
-            var kmExcedente = kmRodados - LimiteKmPorDiaria * _reserva.Veiculo.Diarias;
+            var kmRodados = new Vistoria { KmFinal = kmChegada }.CalcularKmRodados(Item.KmInicial);
+            var kmExcedente = kmRodados - LimiteKmPorDiaria * Item.QuantidadeDias;
             if (kmExcedente > 0)
             {
                 multas.Add(new Multa
@@ -140,9 +160,12 @@ public partial class RegistrarDevolucaoView : UserControl
         Recalcular();
     }
 
+    /// <summary>O botão fica desabilitado no .xaml até a POO-19.</summary>
     private void ConcluirDevolucao_Click(object sender, RoutedEventArgs e)
     {
-        var erro = Validar(out var dataDevolucao);
+        if (_contrato is null) return;
+
+        var erro = Validar(out _);
         if (erro is not null)
         {
             TextoMensagem.Text = erro;
@@ -150,21 +173,10 @@ public partial class RegistrarDevolucaoView : UserControl
             return;
         }
 
-        // TODO: trocar pelo controller: cria a Devolucao, a Vistoria, as Multas e o Pagamento,
+        // TODO (POO-19): trocar pelo controller: cria a Devolucao, a Vistoria, as Multas e o Pagamento,
         // aplica o desconto no Contrato, encerra o contrato e libera o veículo ou o envia para manutenção.
-        var enviarParaManutencao = CampoManutencao.IsChecked == true;
-        DadosDeExemplo.ConcluirDevolucao(_reserva.Id, dataDevolucao, enviarParaManutencao);
-
-        var mensagem = _total > 0
-            ? $"Devolução registrada. Multas: {FormatoHelper.Moeda(_total)}, pagas por {SecaoPagamento.Descricao}."
-            : "Devolução registrada sem multas a pagar.";
-        if (enviarParaManutencao)
-        {
-            mensagem += "\nO veículo foi enviado para manutenção.";
-        }
-
-        MessageBox.Show(mensagem, "Devolução registrada", MessageBoxButton.OK, MessageBoxImage.Information);
-        Navegador.IrParaHome();
+        MessageBox.Show("O registro da devolução ainda não está disponível.", "Registrar devolução",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private string? Validar(out DateTime dataDevolucao)
@@ -174,13 +186,14 @@ public partial class RegistrarDevolucaoView : UserControl
             return "Informe a data da devolução no formato dd/mm/aaaa hh:mm.";
         }
 
-        if (dataDevolucao < _reserva.Retirada)
+        // A locação pode ter começado antes do horário da reserva, então vale o início do contrato.
+        if (dataDevolucao < _contrato!.DataGeracao)
         {
-            return "A devolução não pode ser antes da retirada.";
+            return "A devolução não pode ser antes do início da locação.";
         }
 
         if (!FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var kmChegada) ||
-            kmChegada < (_reserva.KmSaida ?? 0))
+            kmChegada < Item.KmInicial)
         {
             return "Informe uma quilometragem de chegada maior ou igual à de saída.";
         }

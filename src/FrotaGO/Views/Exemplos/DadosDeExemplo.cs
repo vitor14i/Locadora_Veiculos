@@ -197,7 +197,7 @@ public static class DadosDeExemplo
         .OrderBy(reserva => reserva.Devolucao)
         .Select(reserva => new LocacaoItem
         {
-            ReservaId = reserva.Id,
+            ContratoId = reserva.Contrato ?? 0,
             Contrato = $"nº {reserva.Contrato}",
             Cliente = reserva.Cliente.Nome,
             Veiculo = reserva.Veiculo.Nome,

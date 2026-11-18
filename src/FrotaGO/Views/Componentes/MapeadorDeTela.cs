@@ -14,6 +14,10 @@ public static class MapeadorDeTela
     public const string StatusCancelada = "Cancelada";
     public const string StatusExpirada = "Expirada";
 
+    // Situação de uma locação ativa.
+    public const string SituacaoEmDia = "Em dia";
+    public const string SituacaoAtrasada = "Atrasada";
+
     /// <summary>Item da busca, usando a regra de tarifa do próprio model.</summary>
     public static VeiculoItem CriarItem(Veiculo veiculo) => new()
     {
@@ -28,6 +32,29 @@ public static class MapeadorDeTela
         Nome = NomeVeiculo(veiculo),
         Diaria = veiculo.Calcular(1)
     };
+
+    /// <summary>
+    /// Item do veículo com a diária e as diárias gravadas no contrato, e não as atuais do veículo.
+    /// Precisa do veículo do item carregado.
+    /// </summary>
+    public static VeiculoItem CriarItem(ItemContrato item) =>
+        CriarItem(item.Veiculo!) with { Diaria = item.ValorDiaria, Diarias = item.QuantidadeDias };
+
+    /// <summary>Linha das locações ativas. Precisa da reserva com o cliente e dos itens com o veículo.</summary>
+    public static LocacaoItem CriarLocacao(Contrato contrato)
+    {
+        var reserva = contrato.Reserva!;
+
+        return new()
+        {
+            ContratoId = contrato.Id,
+            Contrato = $"nº {contrato.Id}",
+            Cliente = CriarClienteItem(reserva.Cliente!).Nome,
+            Veiculo = string.Join(", ", contrato.Itens.Select(item => NomeVeiculo(item.Veiculo!))),
+            DevolucaoPrevista = FormatoHelper.DiaEHora(reserva.DataFim),
+            Status = reserva.DataFim < DateTime.Now ? SituacaoAtrasada : SituacaoEmDia
+        };
+    }
 
     /// <summary>Mesma regra da ClientesView: pessoa jurídica aparece pela razão social.</summary>
     public static ClienteItem CriarClienteItem(Cliente cliente) => new(
