@@ -39,4 +39,16 @@ public static class FabricaDeControllers
             new UsuarioRepository(contexto),
             new UnidadeDeTrabalho(contexto));
     }
+
+    // ---------- Novo na POO-18 ----------
+
+    /// <summary>Os três objetos usam o mesmo contexto, então um único Salvar() grava tudo.</summary>
+    public static LocacaoController CriarLocacaoController()
+    {
+        var contexto = new FrotaGODbContext();
+        return new LocacaoController(
+            new ReservaRepository(contexto),
+            new ContratoRepository(contexto),
+            new UnidadeDeTrabalho(contexto));
+    }
 }
