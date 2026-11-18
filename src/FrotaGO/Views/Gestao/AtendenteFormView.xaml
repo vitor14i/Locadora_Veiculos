@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel Width="720" HorizontalAlignment="Center" Margin="0,48,0,32">
         <TextBlock Text="Novo atendente" Style="{StaticResource TextoTitulo}" HorizontalAlignment="Center"/>
-        <TextBlock Text="O atendente troca a senha temporária no primeiro acesso, pelo perfil."
+        <TextBlock Text="Informe uma senha temporária. O atendente pode trocá-la depois pelo perfil."
                    Style="{StaticResource TextoSubtitulo}" HorizontalAlignment="Center" Margin="0,8,0,24"/>
 
         <Grid>

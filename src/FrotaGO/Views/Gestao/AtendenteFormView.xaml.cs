@@ -1,18 +1,17 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using FrotaGO.Helpers;
-using FrotaGO.Models;
-using FrotaGO.Views.Exemplos;
+using FrotaGO.Controllers;
 
 namespace FrotaGO.Views.Gestao;
 
 public partial class AtendenteFormView : UserControl
 {
-    private const int TamanhoMinimoSenha = 8;
+    private readonly AtendenteController _atendenteController;
 
     public AtendenteFormView()
     {
         InitializeComponent();
+        _atendenteController = FabricaDeControllers.CriarAtendenteController();
     }
 
     private void Cadastrar_Click(object sender, RoutedEventArgs e)
@@ -20,23 +19,24 @@ public partial class AtendenteFormView : UserControl
         var erro = ValidarFormulario();
         if (erro is not null)
         {
-            TextoMensagem.Text = erro;
-            TextoMensagem.Visibility = Visibility.Visible;
+            MostrarErro(erro);
             return;
         }
 
-        // TODO: trocar pelo controller.
-        DadosDeExemplo.AdicionarAtendente(new Atendente
+        var dados = new DadosAtendente(CampoNome.Text, CampoEmail.Text, CampoMatricula.Text, CampoSenha.Password);
+
+        // O gerente é o usuário logado. Sem usuário, o id 0 não existe e o controller recusa.
+        var resultado = _atendenteController.Cadastrar(dados, Navegador.Usuario?.Id ?? 0);
+        if (!resultado.Sucesso)
         {
-            Nome = CampoNome.Text.Trim(),
-            Email = CampoEmail.Text.Trim().ToLowerInvariant(),
-            Matricula = CampoMatricula.Text.Trim().ToUpperInvariant(),
-            SenhaHash = PasswordHasher.Hash(CampoSenha.Password)
-        });
+            MostrarErro(resultado.Erro);
+            return;
+        }
 
         Navegador.IrPara(new AtendentesView("Atendente cadastrado com sucesso."));
     }
 
+    /// <summary>Só preenchimento e confirmação da senha. As regras de negócio ficam no controller.</summary>
     private string? ValidarFormulario()
     {
         TextBox[] obrigatorios = [CampoNome, CampoEmail, CampoMatricula];
@@ -45,28 +45,18 @@ public partial class AtendenteFormView : UserControl
             return "Preencha todos os campos.";
         }
 
-        var email = CampoEmail.Text.Trim().ToLowerInvariant();
-        if (!email.Contains('@'))
-        {
-            return "Informe um e-mail válido.";
-        }
-
-        if (DadosDeExemplo.Atendentes.Any(atendente => atendente.Email == email))
-        {
-            return "Este e-mail já está cadastrado.";
-        }
-
-        if (CampoSenha.Password.Length < TamanhoMinimoSenha)
-        {
-            return $"A senha deve ter pelo menos {TamanhoMinimoSenha} caracteres.";
-        }
-
         if (CampoSenha.Password != CampoConfirmarSenha.Password)
         {
             return "As senhas não coincidem.";
         }
 
         return null;
+    }
+
+    private void MostrarErro(string texto)
+    {
+        TextoMensagem.Text = texto;
+        TextoMensagem.Visibility = Visibility.Visible;
     }
 
     private void Cancelar_Click(object sender, RoutedEventArgs e) =>
