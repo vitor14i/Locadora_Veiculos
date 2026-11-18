@@ -10,7 +10,8 @@ public static class FiltrosDeReserva
     /// <summary>
     /// Reservas que ocupam o veículo em algum momento do período pedido:
     /// uma agendada, ainda dentro do prazo de comparecimento, com o período sobreposto; ou
-    /// uma convertida com contrato ativo, da retirada em diante, mesmo que a devolução atrase.
+    /// uma convertida com contrato ativo, do início da locação (DataGeracao) em diante, mesmo que a
+    /// locação tenha começado antes do horário da retirada ou que a devolução atrase.
     /// </summary>
     public static Expression<Func<Reserva, bool>> OcupaVeiculo(DateTime inicio, DateTime fim, DateTime agora)
     {
@@ -24,6 +25,6 @@ public static class FiltrosDeReserva
              fim > reserva.DataInicio) ||
             (reserva.Status == StatusReserva.Convertida &&
              reserva.Contrato!.Status == StatusContrato.Ativo &&
-             fim > reserva.DataInicio);
+             fim > reserva.Contrato!.DataGeracao); // Alterado na POO-18: era fim > reserva.DataInicio
     }
 }
