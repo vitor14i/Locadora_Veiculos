@@ -1,8 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
+using FrotaGO.Repositories.Resultados;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.Gestao;
 
@@ -10,9 +11,12 @@ public partial class RelatoriosView : UserControl
 {
     private const int DiasPadrao = 30;
 
+    private readonly RelatorioController _relatorioController;
+
     public RelatoriosView()
     {
         InitializeComponent();
+        _relatorioController = FabricaDeControllers.CriarRelatorioController();
         CampoInicio.Text = FormatoHelper.DataCampo(DateTime.Today.AddDays(-DiasPadrao));
         CampoFim.Text = FormatoHelper.DataCampo(DateTime.Today);
         Atualizar();
@@ -22,6 +26,7 @@ public partial class RelatoriosView : UserControl
 
     private void Atualizar()
     {
+        // A tela confere só o formato. A regra do período fica no controller.
         if (!FormatoHelper.TentarLerData(CampoInicio.Text, out var inicio) ||
             !FormatoHelper.TentarLerData(CampoFim.Text, out var fim))
         {
@@ -29,34 +34,33 @@ public partial class RelatoriosView : UserControl
             return;
         }
 
-        if (fim < inicio)
+        var resultado = _relatorioController.Gerar(inicio, fim);
+        if (!resultado.Sucesso)
         {
-            MostrarErro("A data final deve ser igual ou posterior à inicial.");
+            MostrarErro(resultado.Erro);
             return;
         }
 
         TextoMensagem.Visibility = Visibility.Collapsed;
 
-        // TODO: trocar pelo controller, que busca estes dados com SQL no RelatorioRepository.
-        var locacoes = DadosDeExemplo.LocacoesNoPeriodo(inicio, fim);
-        var faturamento = locacoes.Sum(locacao => locacao.Veiculo.Total);
+        var relatorio = resultado.Valor;
+        TextoFaturamento.Text = FormatoHelper.Moeda(relatorio.Resumo.Faturamento);
+        TextoLocacoes.Text = relatorio.Resumo.Locacoes.ToString();
+        TextoValorMedio.Text = FormatoHelper.Moeda(relatorio.ValorMedio);
 
-        TextoFaturamento.Text = FormatoHelper.Moeda(faturamento);
-        TextoLocacoes.Text = locacoes.Count.ToString();
-        TextoValorMedio.Text = FormatoHelper.Moeda(locacoes.Count == 0 ? 0 : faturamento / locacoes.Count);
-
-        var ranking = locacoes
-            .GroupBy(locacao => locacao.Veiculo.Nome)
-            .Select(grupo => new { Veiculo = grupo.Key, Locacoes = grupo.Count(), Total = grupo.Sum(item => item.Veiculo.Total) })
-            .OrderByDescending(item => item.Locacoes)
-            .ThenByDescending(item => item.Total)
-            .Select((item, indice) => new LinhaRanking($"{indice + 1}º", item.Veiculo, item.Locacoes,
-                                                        FormatoHelper.Moeda(item.Total)))
+        // O ranking já vem ordenado do SQL. A posição é o índice na lista.
+        var ranking = relatorio.Ranking
+            .Select((veiculo, indice) => CriarLinha(veiculo, indice + 1))
             .ToList();
 
         TabelaRanking.ItemsSource = ranking;
         TextoVazio.Visibility = ranking.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    /// <summary>Converte o resultado do SQL na linha da tabela, com o mesmo nome de veículo das outras telas.</summary>
+    private static LinhaRanking CriarLinha(VeiculoMaisLocado veiculo, int posicao) =>
+        new($"{posicao}º", $"{veiculo.Marca} {veiculo.Modelo} · {veiculo.Ano}", veiculo.Locacoes,
+            FormatoHelper.Moeda(veiculo.Faturamento));
 
     private void MostrarErro(string texto)
     {
