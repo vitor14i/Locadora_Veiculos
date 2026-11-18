@@ -1,15 +1,13 @@
-﻿using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using FrotaGO.Controllers;
+using FrotaGO.Helpers;
 using FrotaGO.Views.AreaFuncionario;
 
 namespace FrotaGO.Views.Acesso;
 
 public partial class CriarContaView : UserControl
 {
-    private const string FormatoData = "dd/MM/yyyy";
-
     /// <summary>Verdadeiro quando um funcionário cadastra um cliente atendido na loja.</summary>
     private readonly bool _modoFuncionario;
 
@@ -99,9 +97,7 @@ public partial class CriarContaView : UserControl
 
     /// <summary>Converte a data de nascimento. Só é chamado depois de ValidarFormulario conferir o formato.</summary>
     private DateTime? LerDataNascimento() =>
-        EhPessoaFisica
-            ? DateTime.ParseExact(CampoNascimento.Text.Trim(), FormatoData, CultureInfo.InvariantCulture)
-            : null;
+        EhPessoaFisica && FormatoHelper.TentarLerData(CampoNascimento.Text, out var data) ? data : null;
 
     /// <summary>
     /// Validações de preenchimento da tela: campos vazios, formato da data e confirmação da senha.
@@ -118,9 +114,7 @@ public partial class CriarContaView : UserControl
             return "Preencha todos os campos.";
         }
 
-        if (EhPessoaFisica && !DateTime.TryParseExact(
-                CampoNascimento.Text.Trim(), FormatoData, CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+        if (EhPessoaFisica && !FormatoHelper.TentarLerData(CampoNascimento.Text, out _))
         {
             return "Informe a data de nascimento no formato dd/mm/aaaa.";
         }

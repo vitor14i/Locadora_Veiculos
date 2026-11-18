@@ -8,8 +8,6 @@ namespace FrotaGO.Controllers;
 public class ContaController
 {
     private const int TamanhoMinimoSenha = 8;
-    private const int DigitosCpf = 11;
-    private const int DigitosCnpj = 14;
     private const string MensagemLoginInvalido = "E-mail ou senha incorretos.";
 
     private readonly IUsuarioRepository _usuarios;
@@ -95,9 +93,9 @@ public class ContaController
     {
         if (dados.EhPessoaFisica)
         {
-            if (documento.Length != DigitosCpf)
+            if (documento.Length != DocumentoHelper.DigitosCpf)
             {
-                return $"O CPF deve ter {DigitosCpf} dígitos.";
+                return $"O CPF deve ter {DocumentoHelper.DigitosCpf} dígitos.";
             }
 
             if (dados.DataNascimento is null)
@@ -108,9 +106,9 @@ public class ContaController
             return _usuarios.CpfExiste(documento) ? "Este CPF já está cadastrado." : null;
         }
 
-        if (documento.Length != DigitosCnpj)
+        if (documento.Length != DocumentoHelper.DigitosCnpj)
         {
-            return $"O CNPJ deve ter {DigitosCnpj} dígitos.";
+            return $"O CNPJ deve ter {DocumentoHelper.DigitosCnpj} dígitos.";
         }
 
         return _usuarios.CnpjExiste(documento) ? "Este CNPJ já está cadastrado." : null;
