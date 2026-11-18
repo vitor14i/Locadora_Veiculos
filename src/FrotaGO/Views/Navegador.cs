@@ -4,7 +4,6 @@ using FrotaGO.Views.Acesso;
 
 namespace FrotaGO.Views;
 
-/// <summary>Troca a tela exibida na janela principal.</summary>
 public static class Navegador
 {
     private static MainWindow? _janela;
@@ -14,8 +13,6 @@ public static class Navegador
 
     public static void IrPara(UserControl tela, bool mostrarCabecalho = true) =>
         Janela.ExibirTela(tela, mostrarCabecalho);
-
-    /// <summary>Registra a home do usuário logado e abre essa tela.</summary>
 
     public static UsuarioSessao? Usuario { get; private set; }
 

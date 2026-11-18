@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FrotaGO.Views.Componentes;
-/// <summary>Linha da lista de visitas do dia.</summary>
+﻿namespace FrotaGO.Views.Componentes;
 public class VisitaItem
 {
     public int ReservaId { get; init; }

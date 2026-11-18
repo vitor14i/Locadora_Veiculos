@@ -198,7 +198,7 @@
         </Setter>
     </Style>
 
-    <!-- Card claro (usado nas próximas telas) -->
+    <!-- Card claro -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource CorCard}"/>
         <Setter Property="CornerRadius" Value="24"/>

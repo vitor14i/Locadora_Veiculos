@@ -18,7 +18,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- Dados comuns -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>

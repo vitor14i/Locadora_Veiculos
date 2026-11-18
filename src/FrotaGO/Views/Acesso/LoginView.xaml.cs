@@ -41,7 +41,6 @@ public partial class LoginView : UserControl
         AbrirHome(resultado.Valor);
     }
 
-    /// <summary>Guarda o usuário na sessão e abre a home do perfil dele.</summary>
     private static void AbrirHome(Usuario usuario)
     {
         var sessao = UsuarioSessao.De(usuario);

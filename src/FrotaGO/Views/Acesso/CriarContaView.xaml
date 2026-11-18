@@ -9,7 +9,6 @@
                        Style="{StaticResource TextoSubtitulo}"
                        HorizontalAlignment="Center" Margin="0,8,0,24"/>
 
-            <!-- Seletor do tipo de cliente -->
             <Border Background="{StaticResource CorCampo}" CornerRadius="22" Padding="4"
                     HorizontalAlignment="Center" Margin="0,0,0,24">
                 <StackPanel Orientation="Horizontal">

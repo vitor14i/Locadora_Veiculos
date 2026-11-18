@@ -2,7 +2,6 @@
 
 namespace FrotaGO.Views;
 
-/// <summary>Dados do usuário logado usados pela interface.</summary>
 public record UsuarioSessao(int Id, string Nome, string Email, string Perfil)
 {
     private const string PerfilGerente = "Gerente";

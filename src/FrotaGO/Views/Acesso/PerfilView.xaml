@@ -7,7 +7,6 @@
             <TextBlock Text="Atualize seus dados e sua senha." Style="{StaticResource TextoSubtitulo}"
                        HorizontalAlignment="Center" Margin="0,8,0,0"/>
 
-            <!-- Dados pessoais -->
             <TextBlock Text="Dados pessoais" Style="{StaticResource TextoSecao}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -44,7 +43,6 @@
             <Button Content="Salvar alterações" Style="{StaticResource BotaoPrincipal}"
                     HorizontalAlignment="Right" Margin="0,16,0,0" Click="SalvarDados_Click"/>
 
-            <!-- Senha -->
             <TextBlock Text="Alterar senha" Style="{StaticResource TextoSecao}"/>
             <TextBlock Text="Senha atual" Style="{StaticResource TextoRotulo}"/>
             <PasswordBox x:Name="CampoSenhaAtual"/>

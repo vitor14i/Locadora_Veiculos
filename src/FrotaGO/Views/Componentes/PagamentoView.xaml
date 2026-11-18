@@ -9,7 +9,6 @@
                          Style="{StaticResource OpcaoPagamento}" Margin="8,0" Checked="Forma_Checked"/>
         </UniformGrid>
 
-        <!-- Cartão -->
         <Grid x:Name="PainelCartao" Margin="0,16,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -32,7 +31,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- Pix -->
         <StackPanel x:Name="PainelPix" Margin="0,16,0,0" Visibility="Collapsed">
             <TextBlock Text="Código da transação" Style="{StaticResource TextoRotulo}"/>
             <TextBox x:Name="CampoCodigoPix"/>

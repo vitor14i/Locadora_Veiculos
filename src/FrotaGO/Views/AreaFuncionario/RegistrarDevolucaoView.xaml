@@ -10,7 +10,6 @@
 
             <componentes:ResumoReservaView x:Name="Resumo"/>
 
-            <!-- Vistoria -->
             <TextBlock Text="Vistoria" Style="{StaticResource TextoSecao}"/>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -42,7 +41,6 @@
             <CheckBox x:Name="CampoManutencao" Content="Enviar veículo para manutenção" Margin="0,12,0,0"
                       Visibility="Collapsed"/>
 
-            <!-- Cobranças -->
             <TextBlock Text="Multas" Style="{StaticResource TextoSecao}"/>
             <Border Background="{StaticResource CorCampo}" CornerRadius="16" Padding="20">
                 <StackPanel>
@@ -84,7 +82,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- Pagamento das multas -->
             <StackPanel x:Name="PainelPagamento" Visibility="Collapsed">
                 <TextBlock Text="Pagamento das multas" Style="{StaticResource TextoSecao}"/>
                 <componentes:PagamentoView x:Name="SecaoPagamento"/>

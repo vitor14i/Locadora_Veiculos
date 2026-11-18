@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FrotaGO.Helpers;
+﻿using FrotaGO.Helpers;
 using FrotaGO.Models;
 
 namespace FrotaGO.Views.Componentes;
 
-/// <summary>Dados exibidos em um card da busca de veículos.</summary>
 public record VeiculoItem
 {
     public int VeiculoId { get; init; }
