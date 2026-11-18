@@ -17,7 +17,10 @@ public class ReservaRepository : IReservaRepository
         _contexto.Reservas
             .Include(reserva => reserva.Veiculo)
             .Include(reserva => reserva.Cliente)
+            // Os itens com o veículo dão aos detalhes da reserva o valor gravado no contrato.
             .Include(reserva => reserva.Contrato)
+                .ThenInclude(contrato => contrato!.Itens)
+                    .ThenInclude(item => item.Veiculo)
             .FirstOrDefault(reserva => reserva.Id == id);
 
     /// <summary>
