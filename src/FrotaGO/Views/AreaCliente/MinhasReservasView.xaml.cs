@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
+using FrotaGO.Models;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
@@ -9,19 +10,27 @@ public partial class MinhasReservasView : UserControl
 {
     private const string FiltroTodas = "Todas";
 
+    // As chaves são os textos dos filtros no .xaml; os valores, as constantes de status.
     private static readonly Dictionary<string, string[]> StatusPorFiltro = new()
     {
-        ["Agendadas"] = ["Agendada"],
-        ["Ativas"] = ["Ativa"],
-        ["Concluídas"] = ["Concluída"],
-        ["Canceladas"] = ["Cancelada", "Expirada"]
+        ["Agendadas"] = [MapeadorDeTela.StatusAgendada],
+        ["Ativas"] = [MapeadorDeTela.StatusAtiva],
+        ["Concluídas"] = [MapeadorDeTela.StatusConcluida],
+        ["Canceladas"] = [MapeadorDeTela.StatusCancelada, MapeadorDeTela.StatusExpirada]
     };
+
+    private readonly ReservaController _reservaController;
+
+    /// <summary>Carregadas uma vez. Os filtros só mudam o que é exibido.</summary>
+    private readonly List<Reserva> _reservas;
 
     private string _filtro = FiltroTodas;
 
     public MinhasReservasView(string? mensagemSucesso = null)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
+        _reservas = _reservaController.ListarDoCliente(Navegador.Usuario!.Id);
 
         if (mensagemSucesso is not null)
         {
@@ -43,16 +52,17 @@ public partial class MinhasReservasView : UserControl
 
     private void ExibirReservas()
     {
-        // TODO: trocar pelas reservas do cliente logado vindas do controller.
-        var cards = DadosDeExemplo.ReservasDoClienteAtual()
-            .Where(reserva => _filtro == FiltroTodas || StatusPorFiltro[_filtro].Contains(reserva.Status))
-            .OrderBy(reserva => reserva.Status is "Ativa" or "Agendada" ? 0 : 1)
-            .ThenByDescending(reserva => reserva.Retirada)
-            .Select(DadosDeExemplo.CriarCard)
+        var cards = _reservas
+            .Where(reserva => _filtro == FiltroTodas ||
+                              StatusPorFiltro[_filtro].Contains(MapeadorDeTela.TextoStatus(reserva)))
+            .OrderBy(reserva => MapeadorDeTela.TextoStatus(reserva) is MapeadorDeTela.StatusAtiva
+                                                                     or MapeadorDeTela.StatusAgendada ? 0 : 1)
+            .ThenByDescending(reserva => reserva.DataInicio)
+            .Select(MapeadorDeTela.CriarCard)
             .ToList();
 
         ListaCards.ItemsSource = cards;
-        TextoVazio.Text = DadosDeExemplo.ReservasDoClienteAtual().Any()
+        TextoVazio.Text = _reservas.Count > 0
             ? "Nenhuma reserva com esse status."
             : "Você ainda não tem reservas.";
         TextoVazio.Visibility = cards.Count == 0 ? Visibility.Visible : Visibility.Collapsed;

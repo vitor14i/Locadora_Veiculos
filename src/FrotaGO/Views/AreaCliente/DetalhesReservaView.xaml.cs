@@ -1,35 +1,52 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
+using FrotaGO.Models;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
 public partial class DetalhesReservaView : UserControl
 {
-    private readonly ReservaExemplo _reserva;
+    private readonly ReservaController _reservaController;
+    private readonly int _reservaId;
 
     public DetalhesReservaView(int reservaId)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
+        _reservaId = reservaId;
 
-        // TODO: buscar a reserva pelo controller.
-        _reserva = DadosDeExemplo.Reservas.First(reserva => reserva.Id == reservaId);
+        // Só encontra as reservas do cliente logado.
+        var reserva = _reservaController.ObterDoCliente(reservaId, Navegador.Usuario!.Id);
+        if (reserva is null)
+        {
+            TextoNumero.Text = "Reserva não encontrada.";
+            Resumo.Visibility = Visibility.Collapsed;
+            ConfigurarAcoes(string.Empty);
+            return;
+        }
 
-        TextoNumero.Text = $"Reserva nº {_reserva.Id}";
-        PainelStatus.DataContext = _reserva;
-        Resumo.DataContext = MontarResumo(_reserva);
-        ConfigurarAcoes(_reserva.Status);
+        // O selo de status liga em {Binding Status}: usa o item de tela, com o status já em texto.
+        var card = MapeadorDeTela.CriarCard(reserva);
+
+        TextoNumero.Text = $"Reserva nº {reserva.Id}";
+        PainelStatus.DataContext = card;
+        Resumo.DataContext = MontarResumo(reserva, card.Status);
+        ConfigurarAcoes(card.Status);
     }
 
-    private static ResumoReservaItem MontarResumo(ReservaExemplo reserva)
+    private static ResumoReservaItem MontarResumo(Reserva reserva, string status)
     {
-        var rotuloTotal = reserva.Status is "Ativa" or "Concluída" ? "Valor total" : "Valor estimado";
-        var resumo = ResumoReservaItem.Criar(reserva.Veiculo, reserva.Retirada, reserva.Devolucao, rotuloTotal);
+        var rotuloTotal = status is MapeadorDeTela.StatusAtiva or MapeadorDeTela.StatusConcluida
+            ? "Valor total"
+            : "Valor estimado";
+        var veiculo = MapeadorDeTela.CriarItem(reserva.Veiculo!).ParaPeriodo(reserva.DataInicio, reserva.DataFim);
+        var resumo = ResumoReservaItem.Criar(veiculo, reserva.DataInicio, reserva.DataFim, rotuloTotal);
 
         if (reserva.Contrato is not null)
         {
-            resumo.Linhas.Insert(0, new DetalheLinha("Contrato", $"nº {reserva.Contrato}"));
+            resumo.Linhas.Insert(0, new DetalheLinha("Contrato", $"nº {reserva.Contrato.Id}"));
         }
 
         return resumo;
@@ -38,10 +55,14 @@ public partial class DetalhesReservaView : UserControl
     /// <summary>Mostra apenas as ações permitidas para o status da reserva.</summary>
     private void ConfigurarAcoes(string status)
     {
-        BotaoCancelar.Visibility = status == "Agendada" ? Visibility.Visible : Visibility.Collapsed;
-        BotaoNovaReserva.Visibility = status is "Cancelada" or "Expirada" ? Visibility.Visible : Visibility.Collapsed;
+        var agendada = status == MapeadorDeTela.StatusAgendada;
 
-        if (status == "Agendada")
+        BotaoCancelar.Visibility = agendada ? Visibility.Visible : Visibility.Collapsed;
+        BotaoNovaReserva.Visibility = status is MapeadorDeTela.StatusCancelada or MapeadorDeTela.StatusExpirada
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        if (agendada)
         {
             TextoAviso.Text = "O pagamento é feito na retirada. Leve um documento com foto e sua CNH.";
             TextoAviso.Visibility = Visibility.Visible;
@@ -56,8 +77,15 @@ public partial class DetalhesReservaView : UserControl
 
         if (resposta != MessageBoxResult.Yes) return;
 
-        // TODO: trocar pelo controller, que também deve conferir se a reserva ainda pode ser cancelada.
-        DadosDeExemplo.Cancelar(_reserva.Id);
+        // O controller confere se a reserva é do cliente e se ainda pode ser cancelada.
+        var resultado = _reservaController.Cancelar(_reservaId, Navegador.Usuario!.Id);
+        if (!resultado.Sucesso)
+        {
+            MessageBox.Show(resultado.Erro, "Cancelar reserva",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
         Navegador.IrPara(new MinhasReservasView("Reserva cancelada."));
     }
 
