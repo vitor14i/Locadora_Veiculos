@@ -1,25 +1,28 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FrotaGO.Controllers;
 using FrotaGO.Helpers;
 using FrotaGO.Views.AreaFuncionario;
 using FrotaGO.Views.Componentes;
-using FrotaGO.Views.Exemplos;
 
 namespace FrotaGO.Views.AreaCliente;
 
 public partial class RevisarReservaView : UserControl
 {
+    private readonly ReservaController _reservaController;
+
     private readonly VeiculoItem _veiculo;
     private readonly DateTime _retirada;
     private readonly DateTime _devolucao;
 
     /// <summary>Preenchido quando um funcionário faz a reserva para um cliente na loja.</summary>
-    private readonly ClienteExemplo? _cliente;
+    private readonly ClienteItem? _cliente;
 
     public RevisarReservaView(VeiculoItem veiculo, DateTime retirada, DateTime devolucao,
-                              ClienteExemplo? cliente = null)
+                              ClienteItem? cliente = null)
     {
         InitializeComponent();
+        _reservaController = FabricaDeControllers.CriarReservaController();
         (_veiculo, _retirada, _devolucao, _cliente) = (veiculo, retirada, devolucao, cliente);
 
         var resumo = ResumoReservaItem.Criar(veiculo, retirada, devolucao, "Valor estimado");
@@ -41,13 +44,21 @@ public partial class RevisarReservaView : UserControl
 
     private void Confirmar_Click(object sender, RoutedEventArgs e)
     {
-        // TODO: trocar pelo controller, que confere de novo a disponibilidade e salva a reserva.
-        var reserva = DadosDeExemplo.Agendar(_cliente ?? DadosDeExemplo.ClienteAtual,
-                                             _veiculo, _retirada, _devolucao);
+        // O controller confere de novo a disponibilidade e salva a reserva.
+        // Na loja, a reserva é do cliente escolhido. No app, é do cliente logado.
+        var clienteId = _cliente?.Id ?? Navegador.Usuario!.Id;
+        var resultado = _reservaController.Criar(clienteId, _veiculo.VeiculoId, _retirada, _devolucao);
+
+        if (!resultado.Sucesso)
+        {
+            MessageBox.Show(resultado.Erro, "Não foi possível reservar",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
         if (_cliente is not null)
         {
-            Navegador.IrPara(new IniciarLocacaoView(reserva.Id));
+            Navegador.IrPara(new IniciarLocacaoView(resultado.Valor.Id));
             return;
         }
 
