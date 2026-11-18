@@ -13,4 +13,13 @@ public class Multa
     public Devolucao? Devolucao { get; set; }
 
     public void Cancelar() => Status = StatusMulta.Cancelada;
+
+    /// <summary>Marca como paga a multa pendente. Uma multa cancelada continua cancelada.</summary>
+    public void Pagar()
+    {
+        if (Status == StatusMulta.Pendente)
+        {
+            Status = StatusMulta.Paga;
+        }
+    }
 }
