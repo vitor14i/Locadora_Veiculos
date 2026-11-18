@@ -27,6 +27,33 @@ public class VeiculoRepository : IVeiculoRepository
             .OrderBy(veiculo => veiculo.Id)
             .ToList();
 
+    /// <summary>
+    /// Veículos fora de manutenção e sem reserva que ocupe o período, na ordem de cadastro.
+    /// <paramref name="tipo"/> é "Carro", "Moto" ou null para todos. Apenas para leitura.
+    /// </summary>
+    public List<Veiculo> ListarDisponiveis(DateTime inicio, DateTime fim, string? tipo, DateTime agora)
+    {
+        // A mesma regra do ReservaRepository.ExisteConflito. Vira uma subconsulta (NOT IN),
+        // e o EF gera uma única consulta ao banco.
+        var ocupados = _contexto.Reservas
+            .Where(FiltrosDeReserva.OcupaVeiculo(inicio, fim, agora))
+            .Select(reserva => reserva.VeiculoId);
+
+        var consulta = _contexto.Veiculos
+            .AsNoTracking()
+            .Where(veiculo => veiculo.Status != StatusVeiculo.EmManutencao &&
+                              !ocupados.Contains(veiculo.Id));
+
+        consulta = tipo switch
+        {
+            "Carro" => consulta.Where(veiculo => veiculo is Carro),
+            "Moto" => consulta.Where(veiculo => veiculo is Moto),
+            _ => consulta
+        };
+
+        return consulta.OrderBy(veiculo => veiculo.Id).ToList();
+    }
+
     /// <summary>Rastreado, porque é usado na edição e ao iniciar uma manutenção.</summary>
     public Veiculo? ObterPorId(int id) =>
         _contexto.Veiculos.FirstOrDefault(veiculo => veiculo.Id == id);
