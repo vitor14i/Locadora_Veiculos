@@ -4,7 +4,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Login, cadastro e consulta de clientes, e perfil de todos os usuários.</summary>
 public class ContaController
 {
     private const string MensagemLoginInvalido = "E-mail ou senha incorretos.";
@@ -60,7 +59,6 @@ public class ContaController
 
     public List<Cliente> ListarClientesAtivos() => _usuarios.ListarClientesAtivos();
 
-    /// <summary>Usuário rastreado, com os dados completos para a tela de perfil.</summary>
     public Usuario? ObterUsuario(int usuarioId) => _usuarios.ObterPorId(usuarioId);
 
     /// <summary>Altera nome e e-mail de qualquer usuário. O telefone só vale para o cliente.</summary>

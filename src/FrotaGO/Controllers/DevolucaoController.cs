@@ -5,13 +5,11 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Prévia das multas e registro da devolução: vistoria, multas, pagamento e encerramento do contrato.</summary>
 public class DevolucaoController
 {
     /// <summary>Quilômetros incluídos em cada diária. O que passar disso é km excedente.</summary>
     private const decimal LimiteKmPorDiaria = 200m;
 
-    /// <summary>Valor cobrado por km excedente.</summary>
     private const decimal ValorPorKmExcedente = 1.00m;
 
     // Início do motivo de cada multa. É também a chave que a tela usa para cancelar um tipo.
@@ -39,7 +37,6 @@ public class DevolucaoController
         _unidadeDeTrabalho = unidadeDeTrabalho;
     }
 
-    /// <summary>Contrato com a reserva, o cliente, os itens com os veículos e os pagamentos. Rastreado.</summary>
     public Contrato? ObterContrato(int contratoId) => _contratos.ObterPorId(contratoId);
 
     /// <summary>Tipo da multa pelo início do motivo, como "Atraso" ou "Km excedente". É a chave do cancelamento.</summary>
@@ -90,16 +87,10 @@ public class DevolucaoController
         return multas;
     }
 
-    /// <summary>
-    /// Registra a devolução: cria a devolução, uma vistoria por item, as multas e o pagamento,
-    /// aplica o desconto, encerra o contrato e libera o veículo ou o envia para manutenção.
-    /// Grava tudo com um único Salvar().
-    /// </summary>
     public Resultado Registrar(DadosDevolucao dados, int usuarioId)
     {
         var agora = DateTime.Now;
 
-        // Rastreado, com a reserva, os itens com os veículos e os pagamentos.
         var contrato = _contratos.ObterPorId(dados.ContratoId);
         if (contrato is null)
         {

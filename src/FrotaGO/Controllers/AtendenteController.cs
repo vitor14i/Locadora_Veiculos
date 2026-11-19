@@ -3,7 +3,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Gestão da equipe de atendimento, feita pelo gerente.</summary>
 public class AtendenteController
 {
     private const string MensagemSomenteGerente = "Somente um gerente ativo pode gerenciar atendentes.";
@@ -48,7 +47,6 @@ public class AtendenteController
         return Resultado.Ok();
     }
 
-    /// <summary>Desativa um atendente ativo ou reativa um desativado.</summary>
     public Resultado AlterarSituacao(int atendenteId, int gerenteId)
     {
         if (!EhGerenteAtivo(gerenteId))

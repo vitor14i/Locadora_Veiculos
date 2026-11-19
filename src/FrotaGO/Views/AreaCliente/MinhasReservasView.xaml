@@ -17,7 +17,6 @@
             <TextBlock x:Name="TextoMensagem" FontSize="14" Foreground="{StaticResource CorSucesso}"
                        Margin="0,16,0,0" Visibility="Collapsed"/>
 
-            <!-- Filtros -->
             <Border Background="{StaticResource CorCampo}" CornerRadius="22" Padding="4"
                     HorizontalAlignment="Left" Margin="0,24,0,0">
                 <StackPanel Orientation="Horizontal">

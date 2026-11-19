@@ -65,7 +65,6 @@ public partial class RegistrarDevolucaoView : UserControl
     private void Recalcular()
     {
         // Os eventos também disparam durante o InitializeComponent.
-        // Sem contrato, não há o que calcular.
         if (!IsInitialized || _contrato is null) return;
 
         PainelAvaria.Visibility = CampoAvaria.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
@@ -104,7 +103,6 @@ public partial class RegistrarDevolucaoView : UserControl
     private decimal? LerKmChegada() =>
         FormatoHelper.TentarLerQuilometragem(CampoKmChegada.Text, out var km) ? km : null;
 
-    /// <summary>Sem a avaria marcada, não há valor de avaria.</summary>
     private decimal? LerValorAvaria() =>
         CampoAvaria.IsChecked == true && FormatoHelper.TentarLerValor(CampoValorAvaria.Text, out var valor)
             ? valor

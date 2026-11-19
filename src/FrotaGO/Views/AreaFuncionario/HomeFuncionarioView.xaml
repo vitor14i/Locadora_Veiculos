@@ -18,7 +18,6 @@
             Style="{StaticResource CardAtalho}" Margin="8,0" Click="Relatorios_Click"/>
             </UniformGrid>
 
-            <!-- Atendimento -->
             <UniformGrid Columns="3" Margin="-8,0">
                 <Button Content="Nova reserva" Tag="Reserve para clientes na loja"
             Style="{StaticResource CardAtalho}" Margin="8,0" Click="NovaReserva_Click"/>
@@ -30,7 +29,6 @@
 
             <TextBlock Text="Visitas de hoje" Style="{StaticResource TextoSecao}"/>
 
-            <!-- Cabeçalho da tabela -->
             <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -46,7 +44,6 @@
                 <TextBlock Grid.Column="4" Text="Ação" Style="{StaticResource TextoCabecalhoTabela}"/>
             </Grid>
 
-            <!-- Linhas -->
             <ItemsControl x:Name="ListaVisitas" ButtonBase.Click="ListaVisitas_Click">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

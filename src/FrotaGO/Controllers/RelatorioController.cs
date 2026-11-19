@@ -2,7 +2,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Relatório de faturamento e de veículos mais locados em um período.</summary>
 public class RelatorioController
 {
     private readonly IRelatorioRepository _relatorios;

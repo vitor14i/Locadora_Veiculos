@@ -11,7 +11,7 @@ public class ItemContrato
     public Contrato? Contrato { get; set; }
     public int VeiculoId { get; set; }
     public Veiculo? Veiculo { get; set; }
-    public Vistoria? Vistoria { get; set; } // 1x1
+    public Vistoria? Vistoria { get; set; }
 
     public decimal CalcularSubtotal() => ValorDiaria * QuantidadeDias;
 }

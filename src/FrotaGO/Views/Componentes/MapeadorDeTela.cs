@@ -14,7 +14,6 @@ public static class MapeadorDeTela
     public const string StatusCancelada = "Cancelada";
     public const string StatusExpirada = "Expirada";
 
-    // Situação de uma locação ativa.
     public const string SituacaoEmDia = "Em dia";
     public const string SituacaoAtrasada = "Atrasada";
 

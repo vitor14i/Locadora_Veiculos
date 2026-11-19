@@ -24,7 +24,6 @@ public partial class LocacoesAtivasView : UserControl
     {
         if (e.OriginalSource is FrameworkElement { DataContext: LocacaoItem locacao })
         {
-            // A devolução abre pelo número do contrato.
             Navegador.IrPara(new RegistrarDevolucaoView(locacao.ContratoId));
         }
     }

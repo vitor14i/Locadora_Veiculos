@@ -12,14 +12,12 @@ public class VeiculoRepository : IVeiculoRepository
 
     public VeiculoRepository(FrotaGODbContext contexto) => _contexto = contexto;
 
-    /// <summary>Toda a frota, na ordem de cadastro. Apenas para leitura.</summary>
     public List<Veiculo> ListarTodos() =>
         _contexto.Veiculos
             .AsNoTracking()
             .OrderBy(veiculo => veiculo.Id)
             .ToList();
 
-    /// <summary>Veículos com o status informado, na ordem de cadastro. Apenas para leitura.</summary>
     public List<Veiculo> ListarPorStatus(StatusVeiculo status) =>
         _contexto.Veiculos
             .AsNoTracking()

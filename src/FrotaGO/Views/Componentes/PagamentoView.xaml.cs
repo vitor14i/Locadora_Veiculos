@@ -37,7 +37,6 @@ public partial class PagamentoView : UserControl
         ? $"cartão {CampoBandeira.SelectedItem} final {CampoDigitos.Text} em {CampoParcelas.SelectedIndex + 1}x"
         : "Pix";
 
-    /// <summary>Cria o model de pagamento com os dados da tela.</summary>
     public Pagamento CriarPagamento() => EhCartao
         ? new Cartao
         {

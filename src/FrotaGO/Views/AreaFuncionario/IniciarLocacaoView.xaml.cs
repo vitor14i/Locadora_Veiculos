@@ -19,7 +19,6 @@ public partial class IniciarLocacaoView : UserControl
         _reservaController = FabricaDeControllers.CriarReservaController();
         _locacaoController = FabricaDeControllers.CriarLocacaoController();
 
-        // A reserva vem do controller, com cliente, veículo e contrato.
         _reserva = _reservaController.Obter(reservaId);
         if (_reserva is null)
         {

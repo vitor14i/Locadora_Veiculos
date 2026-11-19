@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FrotaGO.Helpers;
+﻿using FrotaGO.Helpers;
 
 
 namespace FrotaGO.Views.Componentes;
 
-/// <summary>Dados exibidos no card de resumo da revisão e dos detalhes da reserva.</summary>
 public class ResumoReservaItem
 {
     public string Tipo { get; init; } = string.Empty;

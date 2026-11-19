@@ -1,6 +1,5 @@
 namespace FrotaGO.Controllers;
 
-/// <summary>Resultado de uma operação do controller, com a mensagem de erro para a tela.</summary>
 public class Resultado
 {
     protected Resultado(bool sucesso, string erro)
@@ -19,7 +18,6 @@ public class Resultado
     public static Resultado Falha(string mensagem) => new(false, mensagem);
 }
 
-/// <summary>Resultado que, no sucesso, também devolve um valor.</summary>
 public class Resultado<T> : Resultado
 {
     private readonly T? _valor;

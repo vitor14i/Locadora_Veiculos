@@ -25,7 +25,6 @@ public class ContratoRepository : IContratoRepository
             .Include(contrato => contrato.Pagamentos)
             .FirstOrDefault(contrato => contrato.Id == id);
 
-    /// <summary>Contratos ativos, da devolução prevista mais próxima para a mais distante. Apenas para leitura.</summary>
     public List<Contrato> ListarAtivos() =>
         _contexto.Contratos
             .AsNoTracking()

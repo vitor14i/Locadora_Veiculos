@@ -4,7 +4,6 @@ using FrotaGO.Repositories.Interfaces;
 
 namespace FrotaGO.Controllers;
 
-/// <summary>Busca de veículos, criação, acompanhamento, cancelamento e expiração das reservas.</summary>
 public class ReservaController
 {
     private readonly IReservaRepository _reservas;
